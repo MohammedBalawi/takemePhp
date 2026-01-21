@@ -6,53 +6,43 @@ namespace App\Support;
  * Feature flags for progressive Firestore adoption.
  *
  * Usage examples:
- * - MOCK_MODE=true FIRESTORE_ENABLED=false php artisan serve
- * - FF_DASHBOARD_FIRESTORE=true FIRESTORE_ENABLED=true MOCK_MODE=true php artisan serve
+ * - FIRESTORE_ENABLED=true php artisan serve
  */
 class FeatureFlags
 {
     public static function firestoreEnabled(): bool
     {
-        return (bool) env('FIRESTORE_ENABLED', false);
-    }
-
-    public static function useMock(): bool
-    {
-        return (bool) env('MOCK_MODE', true);
+        return (bool) env('FIRESTORE_ENABLED', true);
     }
 
     public static function featureEnabled(string $key): bool
     {
-        $envKey = 'FF_' . strtoupper($key) . '_FIRESTORE';
-        return (bool) env($envKey, false);
+        return true;
     }
 
     public static function shouldUseFirestore(string $featureKey): bool
     {
-        if (!self::firestoreEnabled()) {
-            return false;
-        }
-        return self::featureEnabled($featureKey);
+        return self::firestoreEnabled();
     }
 
     public static function driversFirestoreEnabled(): bool
     {
-        return self::firestoreEnabled() && self::featureEnabled('DRIVERS');
+        return self::firestoreEnabled();
     }
 
     public static function driverDocumentsFirestoreEnabled(): bool
     {
-        return self::firestoreEnabled() && (bool) env('FF_DRIVER_DOCUMENTS_FIRESTORE', false);
+        return self::firestoreEnabled();
     }
 
     public static function ridesFirestoreEnabled(): bool
     {
-        return self::firestoreEnabled() && self::featureEnabled('RIDES');
+        return self::firestoreEnabled();
     }
 
     public static function paymentsFirestoreEnabled(): bool
     {
-        return self::firestoreEnabled() && (bool) env('FF_PAYMENTS_FIRESTORE', false);
+        return self::firestoreEnabled();
     }
 
     public static function isPaymentsFirestoreEnabled(): bool
@@ -62,36 +52,36 @@ class FeatureFlags
 
     public static function offersFirestoreEnabled(): bool
     {
-        return self::firestoreEnabled() && (bool) env('FF_OFFERS_FIRESTORE', false);
+        return self::firestoreEnabled();
     }
 
     public static function walletTopupsFirestoreEnabled(): bool
     {
-        return self::firestoreEnabled() && (bool) env('FF_WALLET_TOPUPS_FIRESTORE', false);
+        return self::firestoreEnabled();
     }
 
     public static function pricingFirestoreEnabled(): bool
     {
-        return self::firestoreEnabled() && (bool) env('FF_PRICING_FIRESTORE', false);
+        return self::firestoreEnabled();
     }
 
     public static function surgeRulesFirestoreEnabled(): bool
     {
-        return self::firestoreEnabled() && (bool) env('FF_SURGE_RULES_FIRESTORE', false);
+        return self::firestoreEnabled();
     }
 
     public static function monthlyRequestsFirestoreEnabled(): bool
     {
-        return self::firestoreEnabled() && (bool) env('FF_MONTHLY_REQUESTS_FIRESTORE', false);
+        return self::firestoreEnabled();
     }
 
     public static function airportRequestsFirestoreEnabled(): bool
     {
-        return self::firestoreEnabled() && (bool) env('FF_AIRPORT_REQUESTS_FIRESTORE', false);
+        return self::firestoreEnabled();
     }
 
     public static function specialNeedsRequestsFirestoreEnabled(): bool
     {
-        return self::firestoreEnabled() && (bool) env('FF_SPECIAL_NEEDS_REQUESTS_FIRESTORE', false);
+        return self::firestoreEnabled();
     }
 }

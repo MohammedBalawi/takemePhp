@@ -80,9 +80,8 @@ class RidesService
 
     private function buildList(string $type): array
     {
-        $mock = config('mock_data.mock_rides.' . $type, []);
         if (!FeatureFlags::ridesFirestoreEnabled()) {
-            return is_array($mock) ? $mock : [];
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for rides');
         }
 
         if (isset(self::$cache['rides.' . $type])) {
@@ -104,7 +103,7 @@ class RidesService
             return $rows;
         } catch (\Throwable $e) {
             $this->logFallbackOnce($e);
-            return is_array($mock) ? $mock : [];
+            return [];
         }
     }
 
@@ -296,9 +295,8 @@ class RidesService
         if (isset(self::$cache['rides'])) {
             return self::$cache['rides'];
         }
-        $mock = config('mock_data.mock_rides.all', []);
         if (!FeatureFlags::ridesFirestoreEnabled()) {
-            return is_array($mock) ? $mock : [];
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for rides');
         }
         try {
             $docs = $this->firestore->listDocuments('rides', 200);
@@ -310,7 +308,7 @@ class RidesService
             return $rows;
         } catch (\Throwable $e) {
             $this->logFallbackOnce($e);
-            return is_array($mock) ? $mock : [];
+            return [];
         }
     }
 
@@ -319,9 +317,8 @@ class RidesService
         if (isset(self::$cache['ride_requests'])) {
             return self::$cache['ride_requests'];
         }
-        $mock = config('mock_data.mock_ride_requests', []);
         if (!FeatureFlags::ridesFirestoreEnabled()) {
-            return is_array($mock) ? $mock : [];
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for rides');
         }
         try {
             $docs = $this->firestore->listDocuments('ride_requests', 200);
@@ -333,7 +330,7 @@ class RidesService
             return $rows;
         } catch (\Throwable $e) {
             $this->logFallbackOnce($e);
-            return is_array($mock) ? $mock : [];
+            return [];
         }
     }
 

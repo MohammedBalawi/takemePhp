@@ -20,9 +20,8 @@ class SubAdminsService
 
     public function listSubAdmins(): array
     {
-        $mock = config('mock_data.sub_admins', []);
         if (!FeatureFlags::shouldUseFirestore('SUBADMINS')) {
-            return is_array($mock) ? $mock : [];
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for subadmins');
         }
 
         if (isset(self::$cache['subadmins.list'])) {
@@ -65,14 +64,14 @@ class SubAdminsService
             return $mapped;
         } catch (\Throwable $e) {
             $this->logFallbackOnce($e);
-            return is_array($mock) ? $mock : [];
+            return [];
         }
     }
 
     public function createSubAdmin(array $payload): bool
     {
         if (!FeatureFlags::shouldUseFirestore('SUBADMINS')) {
-            return true;
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for subadmins');
         }
 
         try {

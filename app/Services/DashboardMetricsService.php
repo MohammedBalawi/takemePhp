@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Support\FeatureFlags;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 
@@ -19,13 +20,9 @@ class DashboardMetricsService
 
     public function getDashboardMetrics(): array
     {
-        $mock = config('mock_data.dashboard', []);
-        $defaults = is_array($mock) ? $mock : [];
-
-        if ($this->shouldUseMock()) {
-            return $defaults;
+        if (!FeatureFlags::firestoreEnabled()) {
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for dashboard metrics');
         }
-
         $cacheKey = 'dashboard.metrics';
         if (array_key_exists($cacheKey, self::$cache)) {
             return self::$cache[$cacheKey];
@@ -51,14 +48,13 @@ class DashboardMetricsService
             ];
         } catch (\Throwable $e) {
             $this->logFallbackOnce('DASHBOARD', $e);
-            return $defaults;
+            return [];
         }
 
         if ($this->firestore->hadFailure()) {
-            return $defaults;
+            return [];
         }
 
-        $metrics = array_merge($defaults, $metrics);
         self::$cache[$cacheKey] = $metrics;
 
         return $metrics;
@@ -66,11 +62,9 @@ class DashboardMetricsService
 
     public function getRecentRides(int $limit = 10): array
     {
-        $mock = config('mock_data.dashboard.recentRides', []);
-        if ($this->shouldUseMock()) {
-            return is_array($mock) ? $mock : [];
+        if (!FeatureFlags::firestoreEnabled()) {
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for dashboard metrics');
         }
-
         $cacheKey = 'dashboard.recent.' . $limit;
         if (array_key_exists($cacheKey, self::$cache)) {
             return self::$cache[$cacheKey];
@@ -109,11 +103,11 @@ class DashboardMetricsService
             ]);
         } catch (\Throwable $e) {
             $this->logFallbackOnce('DASHBOARD', $e);
-            return is_array($mock) ? $mock : [];
+            return [];
         }
 
         if ($this->firestore->hadFailure()) {
-            return is_array($mock) ? $mock : [];
+            return [];
         }
 
         $results = [];
@@ -405,11 +399,4 @@ class DashboardMetricsService
         $logged[$feature] = true;
     }
 
-    private function shouldUseMock(): bool
-    {
-        if (!\App\Support\FeatureFlags::shouldUseFirestore('DASHBOARD')) {
-            return true;
-        }
-        return false;
-    }
 }

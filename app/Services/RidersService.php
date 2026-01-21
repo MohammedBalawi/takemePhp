@@ -20,9 +20,8 @@ class RidersService
 
     public function listRiders(): array
     {
-        $mock = config('mock_data.riders', []);
-        if (!(FeatureFlags::firestoreEnabled() && FeatureFlags::featureEnabled('RIDERS'))) {
-            return is_array($mock) ? $mock : [];
+        if (!FeatureFlags::firestoreEnabled()) {
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for riders');
         }
 
         if (isset(self::$cache['riders.list'])) {
@@ -33,7 +32,7 @@ class RidersService
             $documents = $this->firestore->listDocuments('users', 500);
             if (count($documents) === 0) {
                 $this->logFallbackOnce(new \RuntimeException('empty_docs'));
-                return is_array($mock) ? $mock : [];
+                return [];
             }
 
             $mapped = [];
@@ -67,14 +66,14 @@ class RidersService
             return $mapped;
         } catch (\Throwable $e) {
             $this->logFallbackOnce($e);
-            return is_array($mock) ? $mock : [];
+            return [];
         }
     }
 
     public function createRider(array $payload): bool
     {
         if (!FeatureFlags::shouldUseFirestore('RIDERS')) {
-            return true;
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for riders');
         }
 
         try {

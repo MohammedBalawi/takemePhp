@@ -17,12 +17,8 @@ class AdminsService
 
     public function listAdmins(): array
     {
-        if (\App\Support\FeatureFlags::useMock()) {
-            $mock = config('mock_data.mock_admins', []);
-            return is_array($mock) ? $mock : [];
-        }
         if (!FeatureFlags::firestoreEnabled()) {
-            return [];
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for admins');
         }
 
         $docs = $this->firestore->listDocuments('admins', 200);
@@ -41,7 +37,7 @@ class AdminsService
     public function updateAdminRoles(string $docIdOrEmail, array $roles, bool $isActive): bool
     {
         if (!FeatureFlags::firestoreEnabled()) {
-            return false;
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for admins');
         }
 
         $roles = $this->normalizeRoles($roles);

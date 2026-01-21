@@ -18,9 +18,8 @@ class DriverDocsService
 
     public function listDriverDocs(): array
     {
-        $mock = config('mock_data.driver_docs', []);
         if (!FeatureFlags::shouldUseFirestore('DRIVERDOCS')) {
-            return is_array($mock) ? $mock : [];
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for driver docs');
         }
 
         if (isset(self::$cache['driverdocs.list'])) {
@@ -47,7 +46,7 @@ class DriverDocsService
             return $mapped;
         } catch (\Throwable $e) {
             $this->logFallbackOnce($e);
-            return is_array($mock) ? $mock : [];
+            return [];
         }
     }
 

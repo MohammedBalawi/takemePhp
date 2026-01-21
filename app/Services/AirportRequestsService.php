@@ -19,7 +19,7 @@ class AirportRequestsService
     public function list(int $limit = 200): array
     {
         if (!FeatureFlags::airportRequestsFirestoreEnabled()) {
-            return config('mock_data.mock_airport_requests', []);
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for airport_requests');
         }
 
         try {
@@ -36,14 +36,14 @@ class AirportRequestsService
             return $rows;
         } catch (\Throwable $e) {
             $this->logFallback($this->reasonFromException($e));
-            return config('mock_data.mock_airport_requests', []);
+            return [];
         }
     }
 
     public function create(array $data): bool
     {
         if (!FeatureFlags::airportRequestsFirestoreEnabled()) {
-            return false;
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for airport_requests');
         }
 
         $payload = $data;

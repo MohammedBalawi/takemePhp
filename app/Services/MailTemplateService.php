@@ -15,19 +15,12 @@ class MailTemplateService
 
     public function getTemplate(string $type): array
     {
-        if (\App\Support\FeatureFlags::useMock()) {
-            $mock = config('mock_data.mail_templates', []);
-            if (isset($mock[$type])) {
-                return $mock[$type];
-            }
-            return $this->defaultTemplate($type);
-        }
         if ($type === '') {
             return $this->defaultTemplate($type);
         }
 
-        if (!\App\Support\FeatureFlags::shouldUseFirestore('MAIL_TEMPLATES')) {
-            return $this->defaultTemplate($type);
+        if (!\App\Support\FeatureFlags::firestoreEnabled()) {
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for mail_templates');
         }
 
         $doc = $this->firestore->getDocumentFields('mail_templates', $type);
@@ -45,11 +38,8 @@ class MailTemplateService
 
     public function saveTemplate(string $type, string $subject, string $bodyHtml, string $bodyText = ''): bool
     {
-        if (\App\Support\FeatureFlags::useMock()) {
-            return true;
-        }
-        if (!\App\Support\FeatureFlags::shouldUseFirestore('MAIL_TEMPLATES')) {
-            return false;
+        if (!\App\Support\FeatureFlags::firestoreEnabled()) {
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for mail_templates');
         }
         if ($type === '') {
             return false;

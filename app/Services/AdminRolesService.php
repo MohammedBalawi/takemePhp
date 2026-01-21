@@ -16,17 +16,8 @@ class AdminRolesService
 
     public function getCurrentAdminDoc(): array
     {
-        if (\App\Support\FeatureFlags::useMock()) {
-            $mock = config('mock_data.mock_admins', []);
-            if (is_array($mock) && count($mock) > 0) {
-                return $mock[0];
-            }
-            return [
-                'email' => 'mock@example.com',
-                'name' => 'Mock Admin',
-                'roles' => ['admin'],
-                'is_active' => true,
-            ];
+        if (!FeatureFlags::firestoreEnabled()) {
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for admin roles');
         }
         $sessionAdmin = session('admin_auth', []);
         $uid = $sessionAdmin['id'] ?? (auth()->guard('admin')->user()->id ?? null);

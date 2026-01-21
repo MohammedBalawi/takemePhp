@@ -19,7 +19,7 @@ class PricingService
     public function listBasePricing(?string $cityId = null): array
     {
         if (!FeatureFlags::pricingFirestoreEnabled()) {
-            return config('mock_data.pricing', []);
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for pricing');
         }
 
         try {
@@ -34,14 +34,14 @@ class PricingService
             return $rows;
         } catch (\Throwable $e) {
             $this->logFallback('PRICING', $this->reasonFromException($e));
-            return config('mock_data.pricing', []);
+            return [];
         }
     }
 
     public function getBasePricing(string $cityKey, string $serviceId): ?array
     {
         if (!FeatureFlags::pricingFirestoreEnabled()) {
-            return null;
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for pricing');
         }
 
         $cityKey = trim($cityKey);
@@ -58,7 +58,7 @@ class PricingService
     public function upsertBasePricing(array $payload): bool
     {
         if (!FeatureFlags::pricingFirestoreEnabled()) {
-            return false;
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for pricing');
         }
 
         $cityId = (string) ($payload['cityId'] ?? '');
@@ -85,7 +85,7 @@ class PricingService
     public function createModifier(array $payload): bool
     {
         if (!FeatureFlags::pricingFirestoreEnabled()) {
-            return false;
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for pricing');
         }
 
         $payload['createdAt'] = $payload['createdAt'] ?? now();

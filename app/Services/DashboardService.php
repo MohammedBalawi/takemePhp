@@ -21,14 +21,8 @@ class DashboardService
 
     public function getStats(): array
     {
-        $mock = config('mock_data.dashboard', []);
-        $defaults = is_array($mock) ? $mock : [];
-
-        if (FeatureFlags::useMock()) {
-            return $defaults;
-        }
         if (!FeatureFlags::firestoreEnabled()) {
-            return $defaults;
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for dashboard');
         }
 
         if (isset(self::$cache['stats'])) {
@@ -51,19 +45,14 @@ class DashboardService
             'pendingSupportRequests' => 0,
         ];
 
-        $stats = array_merge($defaults, $stats);
         self::$cache['stats'] = $stats;
         return $stats;
     }
 
     public function getRecentRides(int $limit = 10): array
     {
-        $mock = config('mock_data.dashboard.recentRides', []);
-        if (FeatureFlags::useMock()) {
-            return is_array($mock) ? $mock : [];
-        }
         if (!FeatureFlags::firestoreEnabled()) {
-            return is_array($mock) ? $mock : [];
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for dashboard');
         }
 
         $cacheKey = 'recent:' . $limit;
@@ -90,11 +79,8 @@ class DashboardService
 
     public function getRideById(string $id): ?array
     {
-        if (FeatureFlags::useMock()) {
-            return null;
-        }
         if (!FeatureFlags::firestoreEnabled()) {
-            return null;
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for dashboard');
         }
 
         $doc = $this->firestore->collection('rides')->document($id)->snapshot();

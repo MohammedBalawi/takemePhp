@@ -10,10 +10,6 @@ class NoSqlServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        if (!function_exists('isMockMode') || !isMockMode()) {
-            return;
-        }
-
         config(['database.default' => 'sqlite']);
         config(['database.connections.sqlite.database' => ':memory:']);
 
@@ -23,7 +19,7 @@ class NoSqlServiceProvider extends ServiceProvider
         DB::disconnect('sqlsrv');
 
         DB::listen(function ($query) {
-            throw new RuntimeException('SQL blocked in MOCK_MODE: ' . $query->sql);
+            throw new RuntimeException('SQL blocked: ' . $query->sql);
         });
     }
 }

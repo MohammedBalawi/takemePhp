@@ -19,7 +19,7 @@ class SpecialNeedsRequestsService
     public function list(int $limit = 200): array
     {
         if (!FeatureFlags::specialNeedsRequestsFirestoreEnabled()) {
-            return config('mock_data.mock_special_needs_requests', []);
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for special_needs_requests');
         }
 
         try {
@@ -36,14 +36,14 @@ class SpecialNeedsRequestsService
             return $rows;
         } catch (\Throwable $e) {
             $this->logFallback($this->reasonFromException($e));
-            return config('mock_data.mock_special_needs_requests', []);
+            return [];
         }
     }
 
     public function create(array $data): bool
     {
         if (!FeatureFlags::specialNeedsRequestsFirestoreEnabled()) {
-            return false;
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for special_needs_requests');
         }
 
         $payload = $data;

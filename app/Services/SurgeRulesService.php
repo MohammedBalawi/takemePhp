@@ -19,7 +19,7 @@ class SurgeRulesService
     public function listRules(array $filters = []): array
     {
         if (!FeatureFlags::surgeRulesFirestoreEnabled()) {
-            return config('mock_data.surge_rules', []);
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for surge rules');
         }
 
         try {
@@ -40,14 +40,14 @@ class SurgeRulesService
             return $rows;
         } catch (\Throwable $e) {
             $this->logFallback('SURGE_RULES', $this->reasonFromException($e));
-            return config('mock_data.surge_rules', []);
+            return [];
         }
     }
 
     public function createRule(array $payload): bool
     {
         if (!FeatureFlags::surgeRulesFirestoreEnabled()) {
-            return false;
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for surge rules');
         }
 
         $payload['createdAt'] = $payload['createdAt'] ?? now();
@@ -65,7 +65,7 @@ class SurgeRulesService
     public function listCities(): array
     {
         if (!FeatureFlags::surgeRulesFirestoreEnabled()) {
-            return config('mock_data.cities', []);
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for surge rules');
         }
 
         try {
@@ -82,7 +82,7 @@ class SurgeRulesService
             return $rows;
         } catch (\Throwable $e) {
             $this->logFallback('SURGE_RULES', $this->reasonFromException($e));
-            return config('mock_data.cities', []);
+            return [];
         }
     }
 

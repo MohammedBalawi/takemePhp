@@ -12,12 +12,9 @@ use App\Console\Commands\DatabaseBackup;
 use App\Console\Commands\FindScheduledRides;
 use App\Console\Commands\SeedMailTemplates;
 use App\Console\Commands\SeedFirestoreAdmin;
-use App\Console\Commands\SeedFirestoreMockData;
 use App\Console\Commands\VerifyFirestore;
 use App\Console\Commands\CreateFirebaseAdmin;
 use App\Console\Commands\FirestoreAdminCreate;
-use App\Console\Commands\FirebaseAppSettingsSeed;
-use App\Console\Commands\DashboardDiagnose;
 use App\Console\Commands\FirebasePing;
 
 class Kernel extends ConsoleKernel
@@ -36,12 +33,9 @@ class Kernel extends ConsoleKernel
         FindScheduledRides::class,
         SeedMailTemplates::class,
         SeedFirestoreAdmin::class,
-        SeedFirestoreMockData::class,
         VerifyFirestore::class,
         CreateFirebaseAdmin::class,
         FirestoreAdminCreate::class,
-        FirebaseAppSettingsSeed::class,
-        DashboardDiagnose::class,
         FirebasePing::class,
     ];
     protected function schedule(Schedule $schedule)

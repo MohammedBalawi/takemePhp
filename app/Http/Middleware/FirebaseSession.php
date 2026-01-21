@@ -12,20 +12,6 @@ class FirebaseSession
 {
     public function handle(Request $request, Closure $next)
     {
-        if (FeatureFlags::useMock()) {
-            if (!Auth::guard('admin')->check()) {
-                $user = new \App\Auth\FirestoreAdminUser([
-                    'id' => 'mock-admin',
-                    'email' => 'mock@example.com',
-                    'name' => 'Mock Admin',
-                    'roles' => ['super_admin'],
-                    'is_active' => true,
-                ]);
-                Auth::guard('admin')->setUser($user);
-            }
-            return $next($request);
-        }
-
         if (Auth::guard('admin')->check()) {
             return $next($request);
         }

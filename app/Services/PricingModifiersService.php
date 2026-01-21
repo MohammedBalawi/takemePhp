@@ -19,7 +19,7 @@ class PricingModifiersService
     public function listModifiers(?string $type = null): array
     {
         if (!FeatureFlags::pricingFirestoreEnabled()) {
-            return config('mock_data.pricing_modifiers', []);
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for pricing modifiers');
         }
 
         try {
@@ -35,14 +35,14 @@ class PricingModifiersService
             return $rows;
         } catch (\Throwable $e) {
             $this->logFallback('PRICING', $this->reasonFromException($e));
-            return config('mock_data.pricing_modifiers', []);
+            return [];
         }
     }
 
     public function createModifier(array $payload): bool
     {
         if (!FeatureFlags::pricingFirestoreEnabled()) {
-            return false;
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for pricing modifiers');
         }
 
         $payload['createdAt'] = $payload['createdAt'] ?? now();
@@ -54,7 +54,7 @@ class PricingModifiersService
     public function deactivateActiveFixedGlobal(): int
     {
         if (!FeatureFlags::pricingFirestoreEnabled()) {
-            return 0;
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for pricing modifiers');
         }
 
         try {
@@ -93,7 +93,7 @@ class PricingModifiersService
     public function updateModifier(string $id, array $payload): bool
     {
         if (!FeatureFlags::pricingFirestoreEnabled()) {
-            return false;
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for pricing modifiers');
         }
 
         $payload['updatedAt'] = $payload['updatedAt'] ?? now();
@@ -103,7 +103,7 @@ class PricingModifiersService
     public function deleteModifier(string $id): bool
     {
         if (!FeatureFlags::pricingFirestoreEnabled()) {
-            return false;
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for pricing modifiers');
         }
         return $this->firestore->deleteDocument('pricing_modifiers', $id);
     }

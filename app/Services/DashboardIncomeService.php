@@ -20,16 +20,12 @@ class DashboardIncomeService
     {
         $series = array_fill(1, 12, 0.0);
         if (!FeatureFlags::firestoreEnabled()) {
-            return $series;
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for dashboard income');
         }
 
         try {
-            $docs = $this->firestore->listDocuments('wallet_topups', 500);
+            $docs = $this->firestore->listDocuments('rides', 500);
             foreach ($docs as $doc) {
-                $status = strtolower((string) ($doc['status'] ?? ''));
-                if ($status !== 'approved') {
-                    continue;
-                }
                 $createdAt = $doc['createdAt'] ?? $doc['created_at'] ?? $doc['_updateTime'] ?? null;
                 if (!$createdAt) {
                     continue;
@@ -39,11 +35,11 @@ class DashboardIncomeService
                     continue;
                 }
                 $month = (int) $dt->format('n');
-                $amount = $doc['amount'] ?? 0;
-                if (is_array($amount)) {
-                    $amount = 0;
+                $total = $doc['pricing']['total'] ?? $doc['fare']['total'] ?? $doc['fare'] ?? 0;
+                if (is_array($total)) {
+                    $total = 0;
                 }
-                $series[$month] += (float) $amount;
+                $series[$month] += (float) $total;
             }
         } catch (\Throwable $e) {
             $this->logFallback($this->reasonFromException($e));

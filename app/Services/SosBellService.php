@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use App\Support\FeatureFlags;
 
 class SosBellService
@@ -18,7 +19,7 @@ class SosBellService
     public function hasUnreadSos(): bool
     {
         if (!FeatureFlags::firestoreEnabled()) {
-            return false;
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for sos alerts');
         }
 
         try {
@@ -50,22 +51,45 @@ class SosBellService
     public function markSeen(): void
     {
         if (!FeatureFlags::firestoreEnabled()) {
-            return;
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for sos alerts');
         }
 
-        $this->firestore->patchDocumentPath('admin_meta/sos_seen/primary', [
-            'lastSeenAt' => now(),
-        ]);
+        $latest = $this->getLatestSosTimestamp();
+        $key = $this->cacheKey();
+        Cache::put($key, $latest ?? now()->toIso8601String(), now()->addDays(7));
     }
 
     private function getLastSeenAt(): ?string
     {
-        $doc = $this->firestore->getDocumentPath('admin_meta/sos_seen/primary');
-        if (!is_array($doc) || !isset($doc['fields'])) {
+        $key = $this->cacheKey();
+        $cached = Cache::get($key);
+        return is_string($cached) ? $cached : null;
+    }
+
+    private function getLatestSosTimestamp(): ?string
+    {
+        try {
+            $docs = $this->firestore->listDocuments('sos_alerts', 200);
+            $latest = null;
+            foreach ($docs as $doc) {
+                $createdAt = $doc['createdAt'] ?? $doc['created_at'] ?? $doc['_updateTime'] ?? null;
+                if (!$createdAt) {
+                    continue;
+                }
+                if ($latest === null || strtotime((string) $createdAt) > strtotime((string) $latest)) {
+                    $latest = (string) $createdAt;
+                }
+            }
+            return $latest;
+        } catch (\Throwable $e) {
             return null;
         }
-        $fields = $this->firestore->decodeDocumentFields($doc);
-        return is_array($fields) ? ($fields['lastSeenAt'] ?? null) : null;
+    }
+
+    private function cacheKey(): string
+    {
+        $adminId = session('firebase_email', session('admin.email', 'admin'));
+        return 'sos:last_seen:' . $adminId;
     }
 
     private function logFallback(string $reason): void

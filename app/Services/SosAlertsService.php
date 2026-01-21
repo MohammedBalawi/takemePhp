@@ -266,11 +266,10 @@ class SosAlertsService
 
     private function shouldUseFirestore(): bool
     {
-        $flag = env('FF_SOS_FIRESTORE');
-        if ($flag === null) {
-            return \App\Support\FeatureFlags::firestoreEnabled();
+        if (!\App\Support\FeatureFlags::firestoreEnabled()) {
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for sos_alerts');
         }
-        return \App\Support\FeatureFlags::firestoreEnabled() && (bool) $flag;
+        return true;
     }
 
     private function pickName(array $actor): string

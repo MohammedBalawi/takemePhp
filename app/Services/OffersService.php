@@ -22,7 +22,7 @@ class OffersService
     public function listOffers(): array
     {
         if (!FeatureFlags::offersFirestoreEnabled()) {
-            return config('mock_data.offers', []);
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for offers');
         }
 
         try {
@@ -47,14 +47,14 @@ class OffersService
             return $rows;
         } catch (\Throwable $e) {
             $this->logFallback('OFFERS', $this->reasonFromException($e));
-            return config('mock_data.offers', []);
+            return [];
         }
     }
 
     public function listOfferBidders(string $offerId): array
     {
         if (!FeatureFlags::offersFirestoreEnabled()) {
-            return config('mock_data.offer_bidders', []);
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for offers');
         }
 
         $offerId = trim($offerId);
@@ -99,14 +99,14 @@ class OffersService
             return $rows;
         } catch (\Throwable $e) {
             $this->logFallback('OFFERS', $this->reasonFromException($e));
-            return config('mock_data.offer_bidders', []);
+            return [];
         }
     }
 
     public function approveBidder(string $offerId, string $driverUid): bool
     {
         if (!FeatureFlags::offersFirestoreEnabled()) {
-            return false;
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for offers');
         }
 
         $offerId = trim($offerId);

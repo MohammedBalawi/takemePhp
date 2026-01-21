@@ -10,10 +10,6 @@ class Authenticate extends Middleware
 {
     public function handle($request, \Closure $next, ...$guards)
     {
-        if (FeatureFlags::useMock()) {
-            return $next($request);
-        }
-
         return parent::handle($request, $next, ...$guards);
     }
 

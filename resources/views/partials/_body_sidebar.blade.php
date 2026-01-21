@@ -7,11 +7,6 @@
         $isSuperAdmin = in_array('super_admin', $roles, true);
         $isStatsOnly = !$isSuperAdmin;
 
-        $menu->add('<span>'.__('message.book_now').'</span>', [ 'class' => '', 'route' => 'dispatch.create'])
-                ->prepend('<i class="fa fa-plus"></i>')
-                ->data('permission', 'order-add')
-                ->link->attr(['class' => '']);
-
         //Admin Dashboard
         $menu->add('<span>'.__('message.dashboard').'</span>', ['route' => 'home'])
             ->prepend('<i class="fas fa-home"></i>')

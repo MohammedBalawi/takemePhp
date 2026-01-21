@@ -44,7 +44,7 @@ class RidesAdminService
     public function getDetails(string $id, string $source): array
     {
         if (!FeatureFlags::ridesFirestoreEnabled()) {
-            return [];
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for rides');
         }
 
         try {
@@ -60,9 +60,8 @@ class RidesAdminService
 
     private function buildList(string $type): array
     {
-        $mock = config('mock_data.mock_ride_rows', []);
         if (!FeatureFlags::ridesFirestoreEnabled()) {
-            return $this->applyFilter(is_array($mock) ? $mock : [], $type);
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for rides');
         }
 
         if (isset(self::$cache['rides.' . $type])) {
@@ -88,7 +87,7 @@ class RidesAdminService
             return $rows;
         } catch (\Throwable $e) {
             $this->logFallbackOnce($e);
-            return $this->applyFilter(is_array($mock) ? $mock : [], $type);
+            return [];
         }
     }
 

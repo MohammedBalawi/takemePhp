@@ -19,9 +19,8 @@ class PaymentsService
     public function listByType(string $type): array
     {
         $type = strtolower($type);
-        $mock = config('mock_data.payments_' . $type, []);
         if (!FeatureFlags::paymentsFirestoreEnabled()) {
-            return is_array($mock) ? $mock : [];
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for payments');
         }
 
         if (isset(self::$cache['payments.' . $type])) {
@@ -62,7 +61,7 @@ class PaymentsService
             return $rows;
         } catch (\Throwable $e) {
             $this->logFallbackOnce($e);
-            return is_array($mock) ? $mock : [];
+            return [];
         }
     }
 

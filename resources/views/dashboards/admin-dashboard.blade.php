@@ -4,7 +4,7 @@
             <div class="col-lg-12 mb-3">
                 <div class="d-flex align-items-center justify-content-between welcome-content">
                     <div class="navbar-breadcrumb">
-                        <!-- <h4 class="mb-0 font-weight-700">Welcome To Dashboard</h4> -->
+                        <h4 class="mb-0 font-weight-700">Welcome To Dashboard Take Me</h4>
                     </div>
                     <div class="">
 
@@ -12,19 +12,6 @@
                 </div>
             </div>
             <div class="col-lg-12">
-                <div class="row mb-3">
-                    <div class="col-lg-6">
-                        <div class="card card-block card-stretch border-radius-20">
-                            <div class="card-body">
-                                <h5 class="mb-2">Profile</h5>
-                                <div class="d-flex flex-column">
-                                    <span><strong>Name:</strong> {{ $adminName ?? 'Admin' }}</span>
-                                    <span><strong>Language:</strong> {{ $adminLanguage ?? 'ar' }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div class="row">
                     <div class="col-lg-3 col-md-6">
                         <div class="card card-block card-stretch card-height border-radius-20">

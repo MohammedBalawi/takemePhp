@@ -15,26 +15,16 @@ class AppData
 
     public function getAppSettings(): array
     {
-        $defaults = config('mock_data.app_settings', []);
-        $safeDefaults = is_array($defaults) ? $defaults : [];
-        if (!isset($safeDefaults['language_option'])) {
-            $safeDefaults['language_option'] = 'ar';
-        }
-
-        if (isMockMode()) {
-            return $safeDefaults;
-        }
-
         if (!isFirestoreEnabled()) {
-            return $safeDefaults;
+            throw new \RuntimeException('FIRESTORE_ENABLED is false. App requires Firestore.');
         }
 
         $data = $this->firestore->getAppSettings();
         if (!is_array($data)) {
-            return $safeDefaults;
+            return ['language_option' => 'ar'];
         }
 
-        $merged = array_merge($safeDefaults, $data);
+        $merged = $data;
         if (!isset($merged['language_option'])) {
             $merged['language_option'] = 'ar';
         }
@@ -44,55 +34,33 @@ class AppData
 
     public function getFrontendData(string $type): array
     {
-        $defaults = config('mock_data.frontend_data.' . $type, []);
-        if (isMockMode()) {
-            return is_array($defaults) ? $defaults : [];
-        }
-
         if (!isFirestoreEnabled()) {
-            return is_array($defaults) ? $defaults : [];
+            throw new \RuntimeException('FIRESTORE_ENABLED is false. App requires Firestore.');
         }
 
         $data = $this->firestore->getFrontendData($type);
         if (!is_array($data)) {
-            return is_array($defaults) ? $defaults : [];
+            return [];
         }
 
-        return array_merge(is_array($defaults) ? $defaults : [], $data);
+        return $data;
     }
 
     public function getDashboardMetrics(): array
     {
-        $defaults = config('mock_data.dashboard', []);
-        $safeDefaults = is_array($defaults) ? $defaults : [
-            'totalDrivers' => 0,
-            'pendingDrivers' => 0,
-            'totalRiders' => 0,
-            'totalRides' => 0,
-            'todayEarnings' => 0.0,
-            'monthEarnings' => 0.0,
-            'totalEarnings' => 0.0,
-            'sosCount' => 0,
-            'recentRides' => [],
-            'newRideRequests' => 0,
-            'pendingComplaints' => 0,
-            'pendingWithdrawRequests' => 0,
-            'pendingSupportRequests' => 0,
-        ];
-
         if (!\App\Support\FeatureFlags::shouldUseFirestore('DASHBOARD')) {
-            return $safeDefaults;
+            throw new \RuntimeException('FIRESTORE_ENABLED is false. App requires Firestore.');
         }
 
         try {
             $service = app(DashboardMetricsService::class);
             $metrics = $service->getDashboardMetrics();
             if (!is_array($metrics) || count($metrics) === 0) {
-                return $safeDefaults;
+                return [];
             }
-            return array_merge($safeDefaults, $metrics);
+            return $metrics;
         } catch (\Throwable $e) {
-            return $safeDefaults;
+            return [];
         }
     }
 

@@ -48,6 +48,7 @@ use App\Http\Controllers\WhyChooseController;
 use App\Http\Controllers\MonthlyRequestsController;
 use App\Http\Controllers\PricingController;
 use App\Http\Controllers\PricingModifiersController;
+use App\Http\Controllers\SosAlertsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -172,6 +173,7 @@ Route::group(['middleware' => ['admin.session']], function()
     Route::get('monthly/special-needs/create', [MonthlyRequestsController::class, 'specialNeedsCreate'])->name('monthly.special_needs.create');
     Route::post('monthly/special-needs', [MonthlyRequestsController::class, 'specialNeedsStore'])->name('monthly.special_needs.store');
     Route::resource('sos', SosController::class)->only(['index']);
+    Route::get('sos-alerts', [SosAlertsController::class, 'index'])->name('sos.alerts.index');
     Route::resource('withdrawrequest', WithdrawRequestController::class)->only(['index']);
     Route::post('withdrawrequest/{id}/approve', [ WithdrawRequestController::class, 'approve' ])->name('withdrawrequest.approve');
     Route::post('withdrawrequest/{id}/decline', [ WithdrawRequestController::class, 'decline' ])->name('withdrawrequest.decline');

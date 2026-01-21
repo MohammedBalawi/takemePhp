@@ -29,7 +29,7 @@ class MonthlyRequestsService
     public function create(array $data): bool
     {
         if (!FeatureFlags::monthlyRequestsFirestoreEnabled()) {
-            return false;
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for school_monthly_requests');
         }
 
         $payload = $data;
@@ -42,7 +42,7 @@ class MonthlyRequestsService
     private function listByType(string $serviceType, int $limit, string $logType): array
     {
         if (!FeatureFlags::monthlyRequestsFirestoreEnabled()) {
-            return config($logType === 'employee' ? 'mock_data.mock_school_monthly_employee' : 'mock_data.mock_school_monthly_schools', []);
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for school_monthly_requests');
         }
 
         try {
@@ -63,7 +63,7 @@ class MonthlyRequestsService
             return $rows;
         } catch (\Throwable $e) {
             $this->logFallback('MONTHLY', $this->reasonFromException($e));
-            return config($logType === 'employee' ? 'mock_data.mock_school_monthly_employee' : 'mock_data.mock_school_monthly_schools', []);
+            return [];
         }
     }
 

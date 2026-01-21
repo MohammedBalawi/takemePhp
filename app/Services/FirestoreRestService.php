@@ -22,6 +22,9 @@ class FirestoreRestService
 
     public function __construct()
     {
+        if (!FeatureFlags::firestoreEnabled()) {
+            throw new \RuntimeException('FIRESTORE_ENABLED=false. Firestore REST access is disabled.');
+        }
         if (self::$sharedClient === null) {
             self::$sharedClient = new Client([
                 'connect_timeout' => (float) env('FIRESTORE_CONNECT_TIMEOUT', 2),

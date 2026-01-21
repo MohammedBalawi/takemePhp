@@ -20,16 +20,6 @@ class AdminFirestoreRepository
             return null;
         }
 
-        if (\App\Support\FeatureFlags::useMock()) {
-            $mock = config('mock_data.mock_admins', []);
-            foreach ($mock as $admin) {
-                if (strtolower((string) ($admin['email'] ?? '')) === $email) {
-                    return $this->normalizeAdmin($admin);
-                }
-            }
-            return null;
-        }
-
         $admin = $this->firestore->getAdminByEmail($email);
         if (!empty($admin)) {
             return $this->normalizeAdmin($admin);
@@ -48,16 +38,6 @@ class AdminFirestoreRepository
     {
         $id = trim($id);
         if ($id === '') {
-            return null;
-        }
-
-        if (\App\Support\FeatureFlags::useMock()) {
-            $mock = config('mock_data.mock_admins', []);
-            foreach ($mock as $admin) {
-                if ((string) ($admin['id'] ?? '') === $id) {
-                    return $this->normalizeAdmin($admin);
-                }
-            }
             return null;
         }
 

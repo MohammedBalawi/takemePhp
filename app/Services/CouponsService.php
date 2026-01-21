@@ -19,9 +19,8 @@ class CouponsService
 
     public function listCoupons(): array
     {
-        $mock = config('mock_data.coupons', []);
         if (!FeatureFlags::shouldUseFirestore('COUPONS')) {
-            return is_array($mock) ? $mock : [];
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for coupons');
         }
 
         if (isset(self::$cache['coupons.list'])) {
@@ -48,14 +47,14 @@ class CouponsService
             return $mapped;
         } catch (\Throwable $e) {
             $this->logFallbackOnce($e);
-            return is_array($mock) ? $mock : [];
+            return [];
         }
     }
 
     public function createCoupon(array $data): bool
     {
         if (!FeatureFlags::shouldUseFirestore('COUPONS')) {
-            return true;
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for coupons');
         }
 
         try {

@@ -20,11 +20,10 @@ class DriversService
 
     public function listDrivers(?string $status = null): array
     {
-        $mock = config('mock_data.drivers', []);
         $cacheKey = 'drivers.list.' . ($status ?: 'all');
 
         if (!FeatureFlags::driversFirestoreEnabled()) {
-            return $this->filterMockDrivers($mock, $status);
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for drivers');
         }
 
         if (isset(self::$cache[$cacheKey])) {
@@ -65,14 +64,14 @@ class DriversService
             return $mapped;
         } catch (\Throwable $e) {
             $this->logFallbackOnce($e, 'DRIVERS');
-            return $this->filterMockDrivers($mock, $status);
+            return [];
         }
     }
 
     public function createDriver(array $payload): bool
     {
         if (!FeatureFlags::driversFirestoreEnabled()) {
-            return true;
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for drivers');
         }
 
         try {
@@ -110,14 +109,14 @@ class DriversService
             return $this->firestore->patchDocumentTyped('drivers', $uid, $fields);
         } catch (\Throwable $e) {
             $this->logFallbackOnce($e, 'DRIVERS');
-            return true;
+            return false;
         }
     }
 
     public function getDriverDocuments(string $driverId): array
     {
         if (!FeatureFlags::driverDocumentsFirestoreEnabled()) {
-            return [];
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for driver documents');
         }
 
         try {
@@ -132,11 +131,10 @@ class DriversService
 
     public function listPendingDrivers(): array
     {
-        $mock = config('mock_data.pending_drivers', config('mock_data.mock_pending_drivers', []));
         $cacheKey = 'drivers.list.pending';
 
         if (!FeatureFlags::driversFirestoreEnabled()) {
-            return is_array($mock) ? $mock : [];
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for drivers');
         }
 
         if (isset(self::$cache[$cacheKey])) {
@@ -174,14 +172,14 @@ class DriversService
             return $mapped;
         } catch (\Throwable $e) {
             $this->logFallbackOnce($e, 'DRIVERS_PENDING');
-            return is_array($mock) ? $mock : [];
+            return [];
         }
     }
 
     public function getDriverById(string $uid): array
     {
         if (!FeatureFlags::driverDocumentsFirestoreEnabled()) {
-            return [];
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for driver documents');
         }
 
         try {
@@ -209,10 +207,8 @@ class DriversService
 
     public function getDriverDocumentsLinks(array $driver): array
     {
-        $mock = config('mock_data.mock_driver_documents', []);
         if (empty($driver)) {
-            $links = is_array($mock) ? $this->mapMockDocuments($mock) : [];
-            return $this->withLinkFlags($links);
+            return $this->withLinkFlags([]);
         }
 
         $docMap = is_array($driver['documents'] ?? null) ? $driver['documents'] : [];
@@ -242,28 +238,6 @@ class DriversService
     public function getDriverDocumentLinks(array $driver): array
     {
         return $this->getDriverDocumentsLinks($driver);
-    }
-
-    private function mapMockDocuments(array $mock): array
-    {
-        $items = [];
-        $labels = [
-            'profile' => 'profile',
-            'license' => 'license',
-            'insurance' => 'insurance',
-            'car_image' => 'car_image',
-            'car_license' => 'car_license',
-            'medical' => 'medical',
-        ];
-
-        foreach ($labels as $key => $label) {
-            $items[] = [
-                'label' => $label,
-                'url' => (string) ($mock[$key] ?? ''),
-            ];
-        }
-
-        return $items;
     }
 
     private function withLinkFlags(array $items): array
@@ -357,24 +331,6 @@ class DriversService
         } catch (\Throwable $e) {
             return (string) $value;
         }
-    }
-
-    private function filterMockDrivers($mock, ?string $status): array
-    {
-        if (!is_array($mock)) {
-            return [];
-        }
-        if ($status !== 'pending') {
-            return $mock;
-        }
-
-        return array_values(array_filter($mock, function ($driver) {
-            $statusValue = strtolower((string) ($driver['verificationStatus'] ?? ''));
-            if ($statusValue === 'pending') {
-                return true;
-            }
-            return $statusValue !== '' && $statusValue !== 'approved';
-        }));
     }
 
     private function logFallbackOnce(\Throwable $e, string $feature): void

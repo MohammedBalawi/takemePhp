@@ -1,7 +1,7 @@
 
 
   <link rel="shortcut icon" class="site_favicon_preview"
-      href="{{ asset('images/logos.png') }}"
+      href="{{ asset('favicon.ico') }}"
        />
 <link rel="stylesheet" href="{{ asset('css/backend-bundle.min.css') }}"/>
 <link rel="stylesheet" href="{{ asset('css/backend.css') }}"/>

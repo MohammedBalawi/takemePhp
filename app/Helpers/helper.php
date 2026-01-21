@@ -19,39 +19,9 @@ use App\Services\FirestoreRestService;
 use App\Services\AppData;
 use App\Support\FeatureFlags;
 
-function isMockMode(): bool
-{
-    return FeatureFlags::useMock();
-}
-
 function isFirestoreEnabled(): bool
 {
     return FeatureFlags::firestoreEnabled();
-}
-
-function mockDataConfig(): array
-{
-    $data = config('mock_data');
-    return is_array($data) ? $data : [];
-}
-
-function mockSettingValue($type, $key)
-{
-    $data = mockDataConfig();
-    return $data['settings'][$type][$key] ?? null;
-}
-
-function mockAppSettingValue($key)
-{
-    $data = mockDataConfig();
-    return $data['app_settings'][$key] ?? null;
-}
-
-function mockFrontendData(string $type): array
-{
-    $data = mockDataConfig();
-    $values = $data['frontend_data'][$type] ?? [];
-    return is_array($values) ? $values : [];
 }
 
 function DummyData($key){
@@ -222,10 +192,6 @@ function AppSetting($key, $default = null)
     $settings = appSettings();
     if (is_object($settings) && isset($settings->$key)) {
         return $settings->$key;
-    }
-    $mock = mockAppSettingValue($key);
-    if ($mock !== null) {
-        return $mock;
     }
     return $default;
 }
@@ -1540,12 +1506,6 @@ function SettingData($type, $key = null)
             logger()->warning('Missing setting', ['type' => $type, 'key' => $key]);
             $missingLogged[$cacheKey] = true;
         }
-    }
-
-    $mock = $key !== null ? mockSettingValue($type, $key) : null;
-    if ($mock !== null) {
-        $resolvedCache[$cacheKey] = $mock;
-        return $mock;
     }
 
     if ($type === 'app_info' && $key === 'app_title') {

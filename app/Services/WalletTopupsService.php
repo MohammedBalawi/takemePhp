@@ -19,7 +19,7 @@ class WalletTopupsService
     public function listByType(string $type): array
     {
         if (!FeatureFlags::walletTopupsFirestoreEnabled()) {
-            return config('mock_data.wallet_topups', []);
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for wallet_topups');
         }
 
         $type = strtolower(trim($type));
@@ -63,14 +63,14 @@ class WalletTopupsService
             return $rows;
         } catch (\Throwable $e) {
             $this->logFallback($this->reasonFromException($e));
-            return config('mock_data.wallet_topups', []);
+            return [];
         }
     }
 
     public function updateStatus(string $docId, string $newStatus): bool
     {
         if (!FeatureFlags::walletTopupsFirestoreEnabled()) {
-            return false;
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for wallet_topups');
         }
 
         $docId = trim($docId);

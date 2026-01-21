@@ -17,8 +17,7 @@ class DriversMapService
     public function listOnlineDrivers(int $limit = 500): array
     {
         if (!FeatureFlags::firestoreEnabled()) {
-            $mock = config('mock_data.driver_map', []);
-            return is_array($mock) ? $mock : [];
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for drivers map');
         }
 
         try {
@@ -58,15 +57,14 @@ class DriversMapService
             return $markers;
         } catch (\Throwable $e) {
             $this->logFallbackOnce($e);
-            $mock = config('mock_data.driver_map', []);
-            return is_array($mock) ? $mock : [];
+            return [];
         }
     }
 
     public function getDriverProfile(string $uid): array
     {
         if ($uid === '' || !FeatureFlags::firestoreEnabled()) {
-            return [];
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for drivers map');
         }
 
         try {
