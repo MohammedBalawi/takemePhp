@@ -1,0 +1,75 @@
+[27-Jun-2025 05:36:11 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 8.1.32. in /home3/awfrappzzz/public_html/vendor/composer/platform_check.php on line 24
+[27-Jun-2025 06:01:30 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 8.1.32. in /home3/awfrappzzz/public_html/vendor/composer/platform_check.php on line 24
+[27-Jun-2025 06:06:10 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 8.1.32. in /home3/awfrappzzz/public_html/vendor/composer/platform_check.php on line 24
+[27-Jun-2025 06:31:30 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 8.1.32. in /home3/awfrappzzz/public_html/vendor/composer/platform_check.php on line 24
+[27-Jun-2025 06:36:11 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 8.1.32. in /home3/awfrappzzz/public_html/vendor/composer/platform_check.php on line 24
+[27-Jun-2025 06:53:38 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 8.1.32. in /home3/awfrappzzz/public_html/vendor/composer/platform_check.php on line 24
+[27-Jun-2025 06:53:38 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 8.1.32. in /home3/awfrappzzz/public_html/vendor/composer/platform_check.php on line 24
+[27-Jun-2025 06:53:39 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 8.1.32. in /home3/awfrappzzz/public_html/vendor/composer/platform_check.php on line 24
+[27-Jun-2025 06:53:39 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 8.1.32. in /home3/awfrappzzz/public_html/vendor/composer/platform_check.php on line 24
+[27-Jun-2025 07:01:30 UTC] PHP Warning:  require(/home3/awfrappzzz/public_html/vendor/composer/../symfony/deprecation-contracts/function.php): Failed to open stream: No such file or directory in /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php on line 41
+[27-Jun-2025 07:01:30 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home3/awfrappzzz/public_html/vendor/composer/../symfony/deprecation-contracts/function.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php:41
+Stack trace:
+#0 /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php(45): {closure}()
+#1 /home3/awfrappzzz/public_html/vendor/autoload.php(25): ComposerAutoloaderInitbfa6ebdcb00c28cd3743e71da0ac4dc8::getLoader()
+#2 /home3/awfrappzzz/public_html/public/index.php(34): require('/home3/awfrappz...')
+#3 /home3/awfrappzzz/public_html/server.php(21): require_once('/home3/awfrappz...')
+#4 {main}
+  thrown in /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php on line 41
+[27-Jun-2025 07:06:11 UTC] PHP Warning:  require(/home3/awfrappzzz/public_html/vendor/composer/../symfony/deprecation-contracts/function.php): Failed to open stream: No such file or directory in /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php on line 41
+[27-Jun-2025 07:06:11 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home3/awfrappzzz/public_html/vendor/composer/../symfony/deprecation-contracts/function.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php:41
+Stack trace:
+#0 /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php(45): {closure}()
+#1 /home3/awfrappzzz/public_html/vendor/autoload.php(25): ComposerAutoloaderInitbfa6ebdcb00c28cd3743e71da0ac4dc8::getLoader()
+#2 /home3/awfrappzzz/public_html/public/index.php(34): require('/home3/awfrappz...')
+#3 /home3/awfrappzzz/public_html/server.php(21): require_once('/home3/awfrappz...')
+#4 {main}
+  thrown in /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php on line 41
+[27-Jun-2025 07:09:15 UTC] PHP Warning:  require(/home3/awfrappzzz/public_html/vendor/composer/../symfony/deprecation-contracts/function.php): Failed to open stream: No such file or directory in /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php on line 41
+[27-Jun-2025 07:09:15 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home3/awfrappzzz/public_html/vendor/composer/../symfony/deprecation-contracts/function.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php:41
+Stack trace:
+#0 /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php(45): {closure}()
+#1 /home3/awfrappzzz/public_html/vendor/autoload.php(25): ComposerAutoloaderInitbfa6ebdcb00c28cd3743e71da0ac4dc8::getLoader()
+#2 /home3/awfrappzzz/public_html/public/index.php(34): require('/home3/awfrappz...')
+#3 /home3/awfrappzzz/public_html/server.php(21): require_once('/home3/awfrappz...')
+#4 {main}
+  thrown in /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php on line 41
+[27-Jun-2025 07:31:29 UTC] PHP Warning:  require(/home3/awfrappzzz/public_html/vendor/composer/../symfony/deprecation-contracts/function.php): Failed to open stream: No such file or directory in /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php on line 41
+[27-Jun-2025 07:31:29 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home3/awfrappzzz/public_html/vendor/composer/../symfony/deprecation-contracts/function.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php:41
+Stack trace:
+#0 /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php(45): {closure}()
+#1 /home3/awfrappzzz/public_html/vendor/autoload.php(25): ComposerAutoloaderInitbfa6ebdcb00c28cd3743e71da0ac4dc8::getLoader()
+#2 /home3/awfrappzzz/public_html/public/index.php(34): require('/home3/awfrappz...')
+#3 /home3/awfrappzzz/public_html/server.php(21): require_once('/home3/awfrappz...')
+#4 {main}
+  thrown in /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php on line 41
+[27-Jun-2025 07:36:12 UTC] PHP Warning:  require(/home3/awfrappzzz/public_html/vendor/composer/../symfony/deprecation-contracts/function.php): Failed to open stream: No such file or directory in /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php on line 41
+[27-Jun-2025 07:36:12 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home3/awfrappzzz/public_html/vendor/composer/../symfony/deprecation-contracts/function.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php:41
+Stack trace:
+#0 /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php(45): {closure}()
+#1 /home3/awfrappzzz/public_html/vendor/autoload.php(25): ComposerAutoloaderInitbfa6ebdcb00c28cd3743e71da0ac4dc8::getLoader()
+#2 /home3/awfrappzzz/public_html/public/index.php(34): require('/home3/awfrappz...')
+#3 /home3/awfrappzzz/public_html/server.php(21): require_once('/home3/awfrappz...')
+#4 {main}
+  thrown in /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php on line 41
+[27-Jun-2025 08:01:29 UTC] PHP Warning:  require(/home3/awfrappzzz/public_html/vendor/composer/../symfony/deprecation-contracts/function.php): Failed to open stream: No such file or directory in /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php on line 41
+[27-Jun-2025 08:01:29 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home3/awfrappzzz/public_html/vendor/composer/../symfony/deprecation-contracts/function.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php:41
+Stack trace:
+#0 /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php(45): {closure}()
+#1 /home3/awfrappzzz/public_html/vendor/autoload.php(25): ComposerAutoloaderInitbfa6ebdcb00c28cd3743e71da0ac4dc8::getLoader()
+#2 /home3/awfrappzzz/public_html/public/index.php(34): require('/home3/awfrappz...')
+#3 /home3/awfrappzzz/public_html/server.php(21): require_once('/home3/awfrappz...')
+#4 {main}
+  thrown in /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php on line 41
+[27-Jun-2025 08:06:12 UTC] PHP Warning:  require(/home3/awfrappzzz/public_html/vendor/composer/../symfony/deprecation-contracts/function.php): Failed to open stream: No such file or directory in /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php on line 41
+[27-Jun-2025 08:06:12 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home3/awfrappzzz/public_html/vendor/composer/../symfony/deprecation-contracts/function.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php:41
+Stack trace:
+#0 /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php(45): {closure}()
+#1 /home3/awfrappzzz/public_html/vendor/autoload.php(25): ComposerAutoloaderInitbfa6ebdcb00c28cd3743e71da0ac4dc8::getLoader()
+#2 /home3/awfrappzzz/public_html/public/index.php(34): require('/home3/awfrappz...')
+#3 /home3/awfrappzzz/public_html/server.php(21): require_once('/home3/awfrappz...')
+#4 {main}
+  thrown in /home3/awfrappzzz/public_html/vendor/composer/autoload_real.php on line 41
+[30-Jun-2025 18:21:27 Asia/Kolkata] PHP Fatal error:  Declaration of Symfony\Component\Cache\CacheItem::expiresAt(?DateTimeInterface $expiration): static must be compatible with PsrExt\Cache\CacheItemInterface::expiresAt($expiration) in /home3/awfrappzzz/public_html/vendor/symfony/cache/CacheItem.php on line 66
+[30-Jun-2025 12:52:29 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 7.4.33. in /home3/awfrappzzz/public_html/vendor/composer/platform_check.php on line 24
+[14-Sep-2025 03:38:51 Asia/Kolkata] PHP Warning:  unlink(/home3/awfrappzzz/public_html/storage/logs/laravel-2025-06-29.log): No such file or directory in /home3/awfrappzzz/public_html/vendor/monolog/monolog/src/Monolog/Handler/RotatingFileHandler.php on line 172

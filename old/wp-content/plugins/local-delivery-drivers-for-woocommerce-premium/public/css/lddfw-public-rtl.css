@@ -1,0 +1,59 @@
+body,
+#lddfw_login,
+#lddfw_forgot_password,
+.alert,
+.lddfw_box,
+.lddfw_sidenav {
+    text-align: right;
+}
+
+#lddfw_header .col-2,
+#lddfw_availability {
+    text-align: left;
+}
+
+body,
+#lddfw_header .lddfw_sidenav a {
+    direction: rtl;
+}
+
+#lddfw_header {
+    direction: ltr;
+}
+
+#lddfw_hide_map_btn svg,
+.fa-angle-double-right {
+    transform: rotate(180deg);
+}
+
+.alert-dismissible {
+    padding-right: 1.25rem;
+    padding-left: 4rem;
+}
+
+#lddfw_header .lddfw_sidenav a {
+    padding: 8px 32px 8px 8px;
+}
+
+.lddfw_box .lddfw_order_address,
+.lddfw_box .lddfw_order_custom,
+.lddfw_box .lddfw_order_distance {
+    padding-left: 0px;
+    padding-right: 45px;
+}
+
+.lddfw_order_view {
+    margin-right: 45px;
+    margin-left: 0px;
+}
+
+.lddfw_handle_column {
+    right: auto;
+    left: 13px;
+}
+
+.lddfw_items img {
+    float: right;
+    margin-left: 10px;
+    margin-right: 0px;
+}
