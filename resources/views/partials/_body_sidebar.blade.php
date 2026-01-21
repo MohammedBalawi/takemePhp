@@ -160,8 +160,35 @@
             ->link->attr(['class' => ''])
             ->href('#sos');
 
-            $menu->sos->add('<span>قائمة الطوارئ</span>', ['class' => 'sidebar-layout' ,'route' => 'sos.index'])
-                ->data('permission', 'sos list')
+        $menu->sos->add('<span>قائمة الطوارئ</span>', ['class' => 'sidebar-layout' ,'route' => 'sos.index'])
+            ->data('permission', 'sos list')
+            ->prepend('<i class="fas fa-list"></i>')
+            ->link->attr(['class' => '']);
+
+        $menu->add('<span>المشاوير </span>', [ 'class' => ''])
+            ->prepend('<i class="fas fa-calendar-alt"></i>')
+            ->nickname('monthly_requests')
+            ->data('permission', 'monthly list')
+            ->link->attr(['class' => ''])
+            ->href('#monthly_requests');
+
+            $menu->monthly_requests->add('<span>المشاوير الموظفين</span>', ['class' => 'sidebar-layout' ,'route' => 'monthly.employee.index'])
+                ->data('permission', 'monthly list')
+                ->prepend('<i class="fas fa-list"></i>')
+                ->link->attr(['class' => '']);
+
+            $menu->monthly_requests->add('<span>المشاوير المدارس</span>', ['class' => 'sidebar-layout' ,'route' => 'monthly.schools.index'])
+                ->data('permission', 'monthly list')
+                ->prepend('<i class="fas fa-list"></i>')
+                ->link->attr(['class' => '']);
+
+            $menu->monthly_requests->add('<span>المشاوير المطارات</span>', ['class' => 'sidebar-layout' ,'route' => 'monthly.airports.index'])
+                ->data('permission', 'monthly list')
+                ->prepend('<i class="fas fa-list"></i>')
+                ->link->attr(['class' => '']);
+
+            $menu->monthly_requests->add('<span>ذو الاحتياجات الخاصة</span>', ['class' => 'sidebar-layout' ,'route' => 'monthly.special_needs.index'])
+                ->data('permission', 'monthly list')
                 ->prepend('<i class="fas fa-list"></i>')
                 ->link->attr(['class' => '']);
 
@@ -171,7 +198,7 @@
             ->link->attr(['class' => '']);
 
         $pending_withdraw_request = $dashboard_metrics['pendingWithdrawRequests'] ?? 0;
-        $menu->add('<span>'.__('message.withdrawrequest').'</span>'.($pending_withdraw_request > 0 ? '<span class="badge badge-dark ride-badge">'.$pending_withdraw_request.'</span>' : ''), ['class' => ''])
+        $menu->add('<span>تحويلات السائق</span>'.($pending_withdraw_request > 0 ? '<span class="badge badge-dark ride-badge">'.$pending_withdraw_request.'</span>' : ''), ['class' => ''])
             ->prepend('<i class="fas fa-money-check"></i>')
             ->nickname('withdrawrequest')
             ->data('permission', 'withdrawrequest list')

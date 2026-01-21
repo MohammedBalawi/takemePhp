@@ -3,75 +3,27 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\WithdrawRequest;
-use App\DataTables\WithdrawRequestDataTable;
-use App\Exports\WithdrawRequestExport;
-use App\Models\Wallet;
-use App\Models\WalletHistory;
-use App\Http\Requests\WithdrawRequestRequest;
-use Illuminate\Support\Facades\DB;
-use App\Notifications\CommonNotification;
-use App\Models\User;
-use App\Models\UserBankAccount;
-use Maatwebsite\Excel\Facades\Excel;
+use App\Services\WalletTopupsService;
 
 class WithdrawRequestController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index(WithdrawRequestDataTable $dataTable)
+    public function index(Request $request, WalletTopupsService $service)
     {
-        $pageTitle = __('message.list_form_title',['form' => __('message.withdrawrequest')] );
-        $auth_user = authSession();
-        $assets = ['datatable'];
-        $withdraw_type = isset($_GET['withdraw_type']) ? $_GET['withdraw_type'] : null;
-        $button = $withdraw_type == 'pending' ? '<a href="'.route('download.withdrawrequest.list').'" class="float-right mr-1 btn btn-sm btn-info"><i class="fas fa-file-csv"></i> '.__('message.csv').'</a>' : '';
-        //$button = ''; '<a href="'.route('withdrawrequest.create').'" class="float-right btn btn-sm btn-primary"><i class="fa fa-plus-circle"></i> '.__('message.add_form_title',['form' => __('message.withdrawrequest')]).'</a>';
-        return $dataTable->render('global.datatable', compact('pageTitle','button','auth_user'));
+        $pageTitle = 'تحويلات السائق';
+        $type = (string) $request->query('withdraw_type', 'all');
+        $rows = $service->listByType($type);
+
+        return view('withdrawrequest.index', compact('pageTitle', 'rows', 'type'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
-        $pageTitle = __('message.add_form_title',[ 'form' => __('message.withdrawrequest')]);
-        
-        return view('withdrawrequest.form', compact('pageTitle'));
+        abort(404);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(WithdrawRequestRequest $request)
+    public function store(Request $request)
     {
-        $data = $request->all();
-        $data['user_id'] = auth()->user()->id ?? $request->user_id;
-
-        $withdrawrequest_exist = WithdrawRequest::where('user_id', $data['user_id'])->where('status', 0)->exists();
-        if($withdrawrequest_exist) {
-            $message = __('message.already_withdrawrequest');
-            if(request()->is('api/*')){
-                return json_message_response( $message, 400 );
-            }
-        }
-        $withdrawrequest = WithdrawRequest::create($data);
-
-        $message = __('message.save_form',['form' => __('message.withdrawrequest')]);
-        
-        if(request()->is('api/*')){
-            return json_message_response( $message );
-        }
-
-        return redirect()->route('withdrawrequest.index')->withSuccess($message);
+        abort(404);
     }
 
     /**
@@ -82,10 +34,7 @@ class WithdrawRequestController extends Controller
      */
     public function edit($id)
     {
-        $pageTitle = __('message.update_form_title',[ 'form' => __('message.withdrawrequest')]);
-        $data = WithdrawRequest::findOrFail($id);
-        
-        return view('withdrawrequest.form', compact('data', 'pageTitle', 'id'));
+        abort(404);
     }
 
     /**
@@ -98,132 +47,37 @@ class WithdrawRequestController extends Controller
 
     public function update(Request $request, $id)
     {
-
+        abort(404);
     }
 
-    public function updateStatus(Request $request)
+    public function approve(Request $request, string $id, WalletTopupsService $service)
     {
-        $withdrawrequest = WithdrawRequest::find($request->id);
-        
-        $data = $request->all();
-        
-        $data['user_id'] = $withdrawrequest->user_id;
-        $user = User::find($withdrawrequest->user_id);
-        if( $data['status'] == 1 )
-        {
-            $wallet = Wallet::where('user_id', $withdrawrequest->user_id)->first();
-            if( $wallet != null ) {
-                if( $wallet->total_amount < $withdrawrequest->amount ) {
-                    $message = __('message.wallet_balance_insufficient');
-                    return json_custom_response(['status' => false, 'message' => $message ]);
-                }
-                try 
-                {
-                    DB::beginTransaction();
-                    $withdrawrequest->fill($data)->update();
-
-                    $wallet->user_id           = $withdrawrequest->user_id;
-                    $wallet->total_amount      = $wallet->total_amount - $withdrawrequest->amount;
-                    $wallet->total_withdrawn   = $wallet->total_withdrawn + $withdrawrequest->amount;
-                    $wallet->currency          = $withdrawrequest->currency;
-                    
-                    $wallet->save();
-                    
-                    $wallet_history_data = [
-                        'user_id'           => $withdrawrequest->user_id,
-                        'type'              => 'debit',
-                        'transaction_type'  => 'withdraw',
-                        'amount'            => $withdrawrequest->amount,
-                        'balance'           => $wallet->total_amount,
-                        'currency'          => $withdrawrequest->currency,
-                        'datetime'          => date('Y-m-d H:i:s'),
-                    ];
-        
-                    WalletHistory::create($wallet_history_data);
-                    DB::commit();
-                } catch(\Exception $e) {
-                    DB::rollBack();
-                    return json_custom_response($e);
-                }
-            }
-        } else {
-            // WithdrawRequest data...
-            $withdrawrequest->fill($request->all())->update();
+        $ok = $service->updateStatus($id, 'approved');
+        if (!$ok) {
+            return redirect()->back()->withErrors(['message' => 'تعذر اعتماد الطلب']);
         }
-
-        $status = 'decline';
-        if( $withdrawrequest->status == 1 ) {
-            $status = 'approved';
-            $message = __('message.withdrawrequest_approved');
-        }
-
-        if( $withdrawrequest->status == 2 ) {
-            $message = __('message.withdrawrequest_declined');
-        }
-        $notification_data = [
-            'id'   => $withdrawrequest->id,
-            'type' => $status,
-            'subject' => __('message.withdrawrequest'),
-            'message' => $message,
-        ];
-        $user->notify(new CommonNotification($notification_data['type'], $notification_data));
-        $message = __('message.update_form',['form' => __('message.withdrawrequest')]);
-
-        if(request()->is('api/*')){
-            return json_message_response( $message );
-        }
-
-        if(request()->ajax()) {
-            return json_custom_response(['status' => true, 'message' => $message ]);
-        }
-
-        if(auth()->check()){
-            return redirect()->route('withdrawrequest.index')->withSuccess($message);
-        }
-        return redirect()->back()->withSuccess($message);
+        return redirect()->back()->withSuccess('تم اعتماد الطلب');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+    public function decline(Request $request, string $id, WalletTopupsService $service)
     {
-        $withdrawrequest = WithdrawRequest::find($id);
-        $status = 'errors';
-        $message = __('message.not_found_entry', ['name' => __('message.withdrawrequest')]);
-
-        if($withdrawrequest != '') {
-            $withdrawrequest->delete();
-            $status = 'success';
-            $message = __('message.delete_form', ['form' => __('message.withdrawrequest')]);
+        $ok = $service->updateStatus($id, 'decline');
+        if (!$ok) {
+            return redirect()->back()->withErrors(['message' => 'تعذر رفض الطلب']);
         }
-        
-        if(request()->is('api/*')){
-            return json_message_response( $message );
-        }
-
-        if(request()->ajax()) {
-            return response()->json(['status' => true, 'message' => $message ]);
-        }
-
-        return redirect()->back()->with($status,$message);
+        return redirect()->back()->withSuccess('تم رفض الطلب');
     }
 
     public function userBankDetail($id)
     {
         $title = __('message.detail_form_title', [ 'form' => __('message.bank') ]);
-        
-        $data = UserBankAccount::where('user_id',$id)->first();
-        
+        $data = null;
+
         return view('withdrawrequest.bankdetail', compact('title','data'));
-        
     }
 
     public function downloadWithdrawRequestList(Request $request)
     {        
-        return Excel::download(new WithdrawRequestExport ,  'withdrawrequest-'.date('Ymd_H_i_s').'.csv', \Maatwebsite\Excel\Excel::CSV);
+        abort(404);
     }
 }

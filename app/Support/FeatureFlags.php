@@ -64,4 +64,34 @@ class FeatureFlags
     {
         return self::firestoreEnabled() && (bool) env('FF_OFFERS_FIRESTORE', false);
     }
+
+    public static function walletTopupsFirestoreEnabled(): bool
+    {
+        return self::firestoreEnabled() && (bool) env('FF_WALLET_TOPUPS_FIRESTORE', false);
+    }
+
+    public static function pricingFirestoreEnabled(): bool
+    {
+        return self::firestoreEnabled() && (bool) env('FF_PRICING_FIRESTORE', false);
+    }
+
+    public static function surgeRulesFirestoreEnabled(): bool
+    {
+        return self::firestoreEnabled() && (bool) env('FF_SURGE_RULES_FIRESTORE', false);
+    }
+
+    public static function monthlyRequestsFirestoreEnabled(): bool
+    {
+        return self::firestoreEnabled() && (bool) env('FF_MONTHLY_REQUESTS_FIRESTORE', false);
+    }
+
+    public static function airportRequestsFirestoreEnabled(): bool
+    {
+        return self::firestoreEnabled() && (bool) env('FF_AIRPORT_REQUESTS_FIRESTORE', false);
+    }
+
+    public static function specialNeedsRequestsFirestoreEnabled(): bool
+    {
+        return self::firestoreEnabled() && (bool) env('FF_SPECIAL_NEEDS_REQUESTS_FIRESTORE', false);
+    }
 }

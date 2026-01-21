@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\DataTables\SurgePriceDataTable;
-use App\Http\Requests\SurgePriceRequest;
-use App\Models\SurgePrice;
 use Illuminate\Http\Request;
+use App\Services\SurgeRulesService;
+use App\Services\PricingService;
+use App\Support\FeatureFlags;
 
 class SurgePriceController extends Controller
 {
@@ -14,14 +14,12 @@ class SurgePriceController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(SurgePriceDataTable $dataTable)
+    public function index(SurgeRulesService $service)
     {
         $pageTitle = __('message.list_form_title',['form' => __('message.surge_price')] );
-        $auth_user = authSession();
-        $assets = ['datatable'];
-        // $button = $auth_user->can('surgeprice add') ? '<a href="'.route('surge-prices.create').'" class="float-right btn btn-sm btn-primary"><i class="fa fa-plus-circle"></i> '.__('message.add_form_title',['form' => __('message.surge_price')]).'</a>' : '';
         $button ='<a href="'.route('surge-prices.create').'" class="float-right btn btn-sm border-radius-10 btn-primary me-2"><i class="fa fa-plus-circle"></i> '.__('message.add_form_title',['form' => __('message.surge_price')]).'</a>';
-        return $dataTable->render('global.datatable', compact('pageTitle','button','auth_user'));
+        $rules = $service->listRules();
+        return view('surge_price.index', compact('pageTitle','button','rules'));
     }
 
     /**
@@ -32,8 +30,8 @@ class SurgePriceController extends Controller
     public function create()
     {
         $pageTitle = __('message.add_form_title',[ 'form' => __('message.surge_price')]);
-        
-        return view('surge_price.form', compact('pageTitle'));
+        $cities = app(SurgeRulesService::class)->listCities();
+        return view('surge_price.form', compact('pageTitle','cities'));
     }
 
     /**
@@ -42,16 +40,103 @@ class SurgePriceController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(SurgePriceRequest $request)
+    public function store(Request $request, SurgeRulesService $service, PricingService $pricingService)
     {
-        SurgePrice::create($request->all());
+        $validated = $request->validate([
+            'city_id' => ['nullable', 'string'],
+            'city_name' => ['nullable', 'string'],
+            'service_id' => ['nullable', 'string'],
+            'rule_type' => ['required', 'string'],
+            'increase_type' => ['required', 'string'],
+            'increase_value' => ['required', 'numeric', 'min:0'],
+            'description' => ['nullable', 'string'],
+            'weather' => ['nullable', 'string'],
+            'day' => ['nullable', 'string'],
+            'time_from' => ['nullable', 'string'],
+            'time_to' => ['nullable', 'string'],
+            'place_key' => ['nullable', 'string'],
+            'status' => ['required', 'string'],
+            'base_fare' => ['nullable', 'numeric', 'min:0'],
+            'per_km' => ['nullable', 'numeric', 'min:0'],
+            'per_min' => ['nullable', 'numeric', 'min:0'],
+            'min_fare' => ['nullable', 'numeric', 'min:0'],
+        ]);
 
-        $message = __('message.save_form',['form' => __('message.surge_price')]);
-        
-        if(request()->is('api/*')){
-            return json_message_response( $message );
+        if (!FeatureFlags::surgeRulesFirestoreEnabled() && !FeatureFlags::pricingFirestoreEnabled()) {
+            return redirect()->back()->withErrors(['message' => 'Firestore disabled']);
         }
 
+        $ruleType = $validated['rule_type'];
+        $ok = true;
+
+        if ($ruleType === 'base_price') {
+            $ok = $pricingService->upsertBasePricing([
+                'cityId' => $validated['city_id'],
+                'serviceId' => $validated['service_id'] ?? '',
+                'baseFare' => $validated['base_fare'] ?? 0,
+                'perKm' => $validated['per_km'] ?? 0,
+                'perMin' => $validated['per_min'] ?? 0,
+                'minFare' => $validated['min_fare'] ?? 0,
+                'status' => $validated['status'],
+            ]);
+
+            if (($validated['time_from'] ?? '') !== '' || ($validated['time_to'] ?? '') !== '') {
+                $ok = $ok && $pricingService->createModifier([
+                    'type' => 'time_price',
+                    'cityId' => $validated['city_id'],
+                    'serviceId' => $validated['service_id'] ?? '',
+                    'timeFrom' => $validated['time_from'] ?? '',
+                    'timeTo' => $validated['time_to'] ?? '',
+                    'baseFare' => $validated['base_fare'] ?? 0,
+                    'perKm' => $validated['per_km'] ?? 0,
+                    'perMin' => $validated['per_min'] ?? 0,
+                    'minFare' => $validated['min_fare'] ?? 0,
+                    'status' => $validated['status'],
+                ]);
+            }
+        } elseif (in_array($ruleType, ['time_price', 'weather_price', 'place_modifier'], true)) {
+            $ok = $pricingService->createModifier([
+                'type' => $ruleType,
+                'cityId' => $validated['city_id'],
+                'cityName' => $validated['city_name'] ?? '',
+                'serviceId' => $validated['service_id'] ?? '',
+                'increaseType' => $validated['increase_type'],
+                'increaseValue' => (float) $validated['increase_value'],
+                'description' => $validated['description'] ?? '',
+                'weather' => $validated['weather'] ?? '',
+                'day' => $validated['day'] ?? 'all',
+                'timeFrom' => $validated['time_from'] ?? '',
+                'timeTo' => $validated['time_to'] ?? '',
+                'placeKey' => $validated['place_key'] ?? '',
+                'status' => $validated['status'],
+            ]);
+        } else {
+            $payload = [
+                'type' => $ruleType,
+                'cityId' => $validated['city_id'],
+                'cityName' => $validated['city_name'] ?? '',
+                'serviceId' => $validated['service_id'] ?? '',
+                'increaseType' => $validated['increase_type'],
+                'increaseValue' => (float) $validated['increase_value'],
+                'description' => $validated['description'] ?? '',
+                'weather' => $validated['weather'] ?? '',
+                'day' => $validated['day'] ?? 'all',
+                'timeFrom' => $validated['time_from'] ?? '',
+                'timeTo' => $validated['time_to'] ?? '',
+                'placeKey' => $validated['place_key'] ?? '',
+                'status' => $validated['status'],
+                'createdAt' => now(),
+                'updatedAt' => now(),
+            ];
+
+            $ok = $service->createRule($payload);
+        }
+
+        if (!$ok) {
+            return redirect()->back()->withErrors(['message' => 'Failed to save rule']);
+        }
+
+        $message = __('message.save_form',['form' => __('message.surge_price')]);
         return redirect()->route('surge-prices.index')->withSuccess($message);
     }
 
@@ -74,18 +159,7 @@ class SurgePriceController extends Controller
      */
     public function edit($id)
     {
-        $pageTitle = __('message.update_form_title',[ 'form' => __('message.surge_price')]);
-        $data = SurgePrice::findOrFail($id);
-        
-        if (is_string($data->from_time)) {
-            $data->from_time = json_decode($data->from_time, true);
-        }
-
-        if (is_string($data->to_time)) {
-            $data->to_time = json_decode($data->to_time, true);
-        }
-
-        return view('surge_price.form', compact('data', 'pageTitle', 'id'));
+        abort(404);
     }
 
     /**
@@ -95,22 +169,9 @@ class SurgePriceController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(SurgePriceRequest $request, $id)
+    public function update(Request $request, $id)
     {
-        $surge_price = SurgePrice::findOrFail($id);
-
-        $surge_price->fill($request->all())->update();
-
-        $message = __('message.update_form',['form' => __('message.surge_price')]);
-
-        if(request()->is('api/*')){
-            return json_message_response( $message );
-        }
-
-        if(auth()->check()){
-            return redirect()->route('surge-prices.index')->withSuccess($message);
-        }
-        return redirect()->back()->withSuccess($message);
+        abort(404);
     }
 
     /**
@@ -121,24 +182,6 @@ class SurgePriceController extends Controller
      */
     public function destroy($id)
     {
-        $surge_price = SurgePrice::find($id);
-        $status = 'errors';
-        $message = __('message.not_found_entry', ['name' => __('message.surge_price')]);
-
-        if($surge_price != '') {
-            $surge_price->delete();
-            $status = 'success';
-            $message = __('message.delete_form', ['form' => __('message.surge_price')]);
-        }
-        
-        if(request()->is('api/*')){
-            return json_message_response( $message );
-        }
-
-        if(request()->ajax()) {
-            return response()->json(['status' => true, 'message' => $message ]);
-        }
-
-        return redirect()->back()->with($status,$message);
+        abort(404);
     }
 }

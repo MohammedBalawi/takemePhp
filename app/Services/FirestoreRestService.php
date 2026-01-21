@@ -151,7 +151,8 @@ class FirestoreRestService
                 return [];
             }
 
-            $url = $baseUrl . '/' . $path . '?pageSize=' . max(1, $pageSize);
+            $encodedPath = $this->encodePathSegments($path);
+            $url = $baseUrl . '/' . $encodedPath . '?pageSize=' . max(1, $pageSize);
             $response = $this->request('GET', $url, [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
@@ -210,7 +211,8 @@ class FirestoreRestService
                 return null;
             }
 
-            $url = $baseUrl . '/' . $path;
+            $encodedPath = $this->encodePathSegments($path);
+            $url = $baseUrl . '/' . $encodedPath;
             $response = $this->request('GET', $url, [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $token,
@@ -257,7 +259,8 @@ class FirestoreRestService
 
             $fieldPaths = array_keys($payloadFields);
             $updateMask = implode('&updateMask.fieldPaths=', array_map('rawurlencode', $fieldPaths));
-            $url = $baseUrl . '/' . $path . '?updateMask.fieldPaths=' . $updateMask;
+            $encodedPath = $this->encodePathSegments($path);
+            $url = $baseUrl . '/' . $encodedPath . '?updateMask.fieldPaths=' . $updateMask;
 
             $response = $this->request('PATCH', $url, [
                 'headers' => [
@@ -299,6 +302,57 @@ class FirestoreRestService
         }
 
         return $this->runStructuredQuery($collection, $filters, $limit);
+    }
+
+    public function createDocument(string $collection, ?string $documentId, array $fields): bool
+    {
+        if (!FeatureFlags::firestoreEnabled()) {
+            return false;
+        }
+        $key = 'createDocument:' . $collection . '/' . ($documentId ?? 'auto');
+        try {
+            $baseUrl = $this->baseUrl();
+            $token = $this->getAccessToken();
+            if ($baseUrl === null || $token === null) {
+                $this->warnOnce($key, 'missing_base_url_or_token');
+                return false;
+            }
+
+            $payloadFields = $this->encodeFields($fields);
+            if (count($payloadFields) === 0) {
+                return false;
+            }
+
+            if ($documentId !== null && $documentId !== '') {
+                $url = $baseUrl . '/' . rawurlencode($collection) . '/' . rawurlencode($documentId);
+                $response = $this->request('PATCH', $url, [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $token,
+                        'Content-Type' => 'application/json',
+                    ],
+                    'json' => [
+                        'fields' => $payloadFields,
+                    ],
+                ], $key);
+                return $this->isSuccessfulResponse($response);
+            }
+
+            $url = $baseUrl . '/' . rawurlencode($collection);
+            $response = $this->request('POST', $url, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token,
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => [
+                    'fields' => $payloadFields,
+                ],
+            ], $key);
+
+            return $this->isSuccessfulResponse($response);
+        } catch (\Throwable $e) {
+            $this->warnOnce($key, $e->getMessage());
+            return false;
+        }
     }
 
     public function deleteDocument(string $collection, string $documentId): bool
@@ -632,10 +686,7 @@ class FirestoreRestService
             $url = $baseUrl . '/' . rawurlencode($collection) . '/' . rawurlencode($documentId)
                 . '?updateMask.fieldPaths=' . $updateMask;
 
-            $payloadFields = [];
-            foreach ($fields as $key => $value) {
-                $payloadFields[$key] = ['stringValue' => (string) $value];
-            }
+            $payloadFields = $this->encodeFields($fields);
 
             $response = $this->request('PATCH', $url, [
                 'headers' => [
@@ -1120,6 +1171,11 @@ class FirestoreRestService
         return end($parts) ?: '';
     }
 
+    public function parseDocumentId(string $name): string
+    {
+        return $this->docIdFromName($name);
+    }
+
     public function toDateTimeStringFromTimestamp($value, ?string $fallbackUpdateTime = null): string
     {
         $candidate = $value ?: $fallbackUpdateTime;
@@ -1159,6 +1215,13 @@ class FirestoreRestService
             return json_encode($value, JSON_UNESCAPED_UNICODE);
         }
         return $value;
+    }
+
+    public function getScalar(array $data, string $path, string $default = ''): string
+    {
+        $value = $this->getField($data, $path, $default);
+        $scalar = $this->safeScalar($value, $default);
+        return is_string($scalar) ? $scalar : (string) $scalar;
     }
 
     private function encodeFields(array $fields): array
@@ -1253,6 +1316,13 @@ class FirestoreRestService
             return ['doubleValue' => $value];
         }
         return ['stringValue' => (string) $value];
+    }
+
+    private function encodePathSegments(string $path): string
+    {
+        $segments = array_filter(explode('/', $path), fn ($segment) => $segment !== '');
+        $encoded = array_map('rawurlencode', $segments);
+        return implode('/', $encoded);
     }
 
     private function isAssocArray(array $value): bool

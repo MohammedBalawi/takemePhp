@@ -45,6 +45,9 @@ use App\Http\Controllers\SubAdminController;
 use App\Http\Controllers\SupportchatHistoryController;
 use App\Http\Controllers\SurgePriceController;
 use App\Http\Controllers\WhyChooseController;
+use App\Http\Controllers\MonthlyRequestsController;
+use App\Http\Controllers\PricingController;
+use App\Http\Controllers\PricingModifiersController;
 
 /*
 |--------------------------------------------------------------------------
@@ -111,7 +114,9 @@ Route::group(['middleware' => ['admin.session']], function()
 
 	Route::resource('role', RoleController::class);
 	Route::resource('region', RegionController::class);
-	Route::resource('service', ServiceController::class);
+	Route::resource('service', ServiceController::class)->only(['index', 'create', 'store']);
+    Route::get('service/{offerId}/bidders', [ ServiceController::class, 'bidders' ])->name('service.bidders');
+    Route::post('service/{offerId}/approve', [ ServiceController::class, 'approve' ])->name('service.approve');
 
     // rider/driver/sub-admin moved above to be public
 
@@ -141,10 +146,35 @@ Route::group(['middleware' => ['admin.session']], function()
     Route::get('ride/payment-status', [RideController::class, 'key'])->defaults('key', 'payment-status')->name('ride.payment-status');
 	Route::resource('coupon', CouponController::class)->except(['show','edit','update','destroy']);
     Route::resource('complaint', ComplaintController::class);
-    Route::resource('surge-prices', SurgePriceController::class);
+    Route::resource('surge-prices', SurgePriceController::class)->only(['index', 'create', 'store']);
+
+    Route::get('pricing', [PricingController::class, 'index'])->name('pricing.index');
+    Route::get('pricing/create', [PricingController::class, 'create'])->name('pricing.create');
+    Route::post('pricing', [PricingController::class, 'store'])->name('pricing.store');
+
+    Route::get('pricing-modifiers', [PricingModifiersController::class, 'index'])->name('pricing_modifiers.index');
+    Route::get('pricing-modifiers/create', [PricingModifiersController::class, 'create'])->name('pricing_modifiers.create');
+    Route::post('pricing-modifiers', [PricingModifiersController::class, 'store'])->name('pricing_modifiers.store');
+
+    Route::get('monthly/employee', [MonthlyRequestsController::class, 'employeeIndex'])->name('monthly.employee.index');
+    Route::get('monthly/employee/create', [MonthlyRequestsController::class, 'employeeCreate'])->name('monthly.employee.create');
+    Route::post('monthly/employee', [MonthlyRequestsController::class, 'employeeStore'])->name('monthly.employee.store');
+
+    Route::get('monthly/schools', [MonthlyRequestsController::class, 'schoolsIndex'])->name('monthly.schools.index');
+    Route::get('monthly/schools/create', [MonthlyRequestsController::class, 'schoolsCreate'])->name('monthly.schools.create');
+    Route::post('monthly/schools', [MonthlyRequestsController::class, 'schoolsStore'])->name('monthly.schools.store');
+
+    Route::get('monthly/airports', [MonthlyRequestsController::class, 'airportsIndex'])->name('monthly.airports.index');
+    Route::get('monthly/airports/create', [MonthlyRequestsController::class, 'airportsCreate'])->name('monthly.airports.create');
+    Route::post('monthly/airports', [MonthlyRequestsController::class, 'airportsStore'])->name('monthly.airports.store');
+
+    Route::get('monthly/special-needs', [MonthlyRequestsController::class, 'specialNeedsIndex'])->name('monthly.special_needs.index');
+    Route::get('monthly/special-needs/create', [MonthlyRequestsController::class, 'specialNeedsCreate'])->name('monthly.special_needs.create');
+    Route::post('monthly/special-needs', [MonthlyRequestsController::class, 'specialNeedsStore'])->name('monthly.special_needs.store');
     Route::resource('sos', SosController::class)->only(['index']);
-    Route::resource('withdrawrequest', WithdrawRequestController::class);
-    Route::post('withdrawrequest/status', [ WithdrawRequestController::class, 'updateStatus' ] )->name('withdraw.request.status');
+    Route::resource('withdrawrequest', WithdrawRequestController::class)->only(['index']);
+    Route::post('withdrawrequest/{id}/approve', [ WithdrawRequestController::class, 'approve' ])->name('withdrawrequest.approve');
+    Route::post('withdrawrequest/{id}/decline', [ WithdrawRequestController::class, 'decline' ])->name('withdrawrequest.decline');
     Route::get('bank-detail/{id}', [ WithdrawRequestController::class, 'userBankDetail' ] )->name('bankdetail');
 
 
@@ -246,7 +276,7 @@ Route::get('driver/location-map', [HomeController::class, 'map'])->name('driver.
     Route::get('download-driver-report-pdf', [ReportController::class, 'downloadDriverReportPdf'])->name('download.driver.report.pdf');
     Route::get('servicewise-report-pdf-export', [ReportController::class, 'serviceWiseReportPdfExport'])->name('download.servicewise.report.pdf');
 
-    Route::get('download-withdrawrequest-list', [ WithdrawRequestController::class, 'downloadWithdrawRequestList'])->name('download.withdrawrequest.list');
+    // download-withdrawrequest-list removed (Firestore-only module)
 
     // sub-admin moved above to be public
 
