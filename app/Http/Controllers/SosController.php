@@ -17,6 +17,7 @@ class SosController extends Controller
         $pageTitle = __('message.list_form_title',['form' => __('message.sos')] );
         $assets = [];
         $button = '';
+        app(\App\Services\SosBellService::class)->markSeen();
         $service = app(SosAlertsService::class);
         $rows = $service->enrichRows($service->listAlerts(100));
 

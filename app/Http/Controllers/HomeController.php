@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use App\Services\DashboardMetricsService;
+use App\Services\DashboardIncomeService;
 
 class HomeController extends Controller
 {
@@ -30,16 +31,16 @@ class HomeController extends Controller
         $dashboard = $metricsService->getDashboardMetrics();
         $recent_riderequest = $metricsService->getRecentRides(10);
 
-        $data['cash_yearly'] = array_fill(0, 12, 0);
-        $data['wallet_yearly'] = array_fill(0, 12, 0);
+        $incomeService = app(DashboardIncomeService::class);
+        $incomeSeries = $incomeService->monthlyIncomeSeries((int) date('Y'));
 
-        return view('dashboards.admin-dashboard', compact('data', 'dashboard', 'recent_riderequest', 'adminName', 'adminLanguage'));
+        return view('dashboards.admin-dashboard', compact('incomeSeries', 'dashboard', 'recent_riderequest', 'adminName', 'adminLanguage'));
     }
 
     public function changeLanguage($locale)
     {
-        App::setLocale($locale);
-        session()->put('locale', $locale);
+        App::setLocale('ar');
+        session()->put('locale', 'ar');
         return redirect()->back();
     }
 

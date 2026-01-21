@@ -272,11 +272,8 @@
 
         var options = {
             series: [{
-                name: "{{ __('message.cash') }}",
-                data: [ <?= implode ( ',' , $data['cash_yearly'] ) ?> ]
-            }, {
-                name: "{{ __('message.wallet') }}",
-                data:[ <?= implode ( ',' , $data['wallet_yearly'] ) ?> ]
+                name: "الدخل",
+                data: [ <?= implode ( ',' , array_values($incomeSeries ?? array_fill(0, 12, 0)) ) ?> ]
             }],
             chart: {
                 type: 'bar',

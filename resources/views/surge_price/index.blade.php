@@ -15,13 +15,15 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>المدينة</th>
                                         <th>النوع</th>
-                                        <th>الزيادة</th>
-                                        <th>الوصف</th>
+                                        <th>النطاق</th>
+                                        <th>المدينة</th>
+                                        <th>الخدمة</th>
+                                        <th>الموديفاير</th>
                                         <th>اليوم</th>
                                         <th>من - إلى</th>
                                         <th>الحالة</th>
+                                        <th>الأولوية</th>
                                         <th>التاريخ</th>
                                     </tr>
                                 </thead>
@@ -30,19 +32,21 @@
                                         @foreach($rules as $rule)
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $rule['cityName'] ?? $rule['cityId'] ?? '-' }}</td>
                                                 <td>{{ $rule['type'] ?? '-' }}</td>
-                                                <td>{{ ($rule['increaseType'] ?? '') . ' ' . ($rule['increaseValue'] ?? '') }}</td>
-                                                <td>{{ $rule['description'] ?? '-' }}</td>
+                                                <td>{{ $rule['scope'] ?? '-' }}</td>
+                                                <td>{{ $rule['cityName'] ?? $rule['cityId'] ?? '-' }}</td>
+                                                <td>{{ $rule['serviceId'] ?? '-' }}</td>
+                                                <td>{{ ($rule['modifierMode'] ?? '') . ' ' . ($rule['modifierValue'] ?? '') }}</td>
                                                 <td>{{ $rule['day'] ?? '-' }}</td>
-                                                <td>{{ ($rule['timeFrom'] ?? '-') . ' - ' . ($rule['timeTo'] ?? '-') }}</td>
-                                                <td>{{ $rule['status'] ?? '-' }}</td>
+                                                <td>{{ ($rule['startTime'] ?? '-') . ' - ' . ($rule['endTime'] ?? '-') }}</td>
+                                                <td>{{ $rule['isActive'] ?? '-' }}</td>
+                                                <td>{{ $rule['priority'] ?? '-' }}</td>
                                                 <td>{{ $rule['createdAt'] ?? '-' }}</td>
                                             </tr>
                                         @endforeach
                                     @else
                                         <tr>
-                                            <td colspan="9">لا يوجد بيانات</td>
+                                            <td colspan="11">لا يوجد بيانات</td>
                                         </tr>
                                     @endif
                                 </tbody>

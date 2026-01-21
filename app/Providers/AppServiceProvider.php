@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\App;
 
 use Illuminate\Database\Events\MigrationsStarted;
 use Illuminate\Database\Events\MigrationsEnded;
@@ -35,6 +36,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        App::setLocale('ar');
     }
 }

@@ -51,6 +51,45 @@ class PricingModifiersService
         return $this->firestore->createDocument('pricing_modifiers', null, $payload);
     }
 
+    public function deactivateActiveFixedGlobal(): int
+    {
+        if (!FeatureFlags::pricingFirestoreEnabled()) {
+            return 0;
+        }
+
+        try {
+            $docs = $this->firestore->listDocuments('pricing_modifiers', 500);
+            $count = 0;
+            foreach ($docs as $doc) {
+                if (($doc['type'] ?? '') !== 'fixed') {
+                    continue;
+                }
+                $isActive = $doc['isActive'] ?? false;
+                if ($isActive === true || $isActive === '1' || $isActive === 1) {
+                    $docId = $doc['_docId'] ?? null;
+                    if ($docId) {
+                        $ok = $this->firestore->patchDocumentTyped('pricing_modifiers', (string) $docId, [
+                            'isActive' => false,
+                            'updatedAt' => now(),
+                        ]);
+                        if ($ok) {
+                            $count++;
+                        }
+                    }
+                }
+            }
+
+            if (env('APP_DEBUG')) {
+                Log::debug('FIXED_MODIFIER_DEACTIVATED count=' . $count);
+            }
+
+            return $count;
+        } catch (\Throwable $e) {
+            $this->logFallback('PRICING', $this->reasonFromException($e));
+            return 0;
+        }
+    }
+
     public function updateModifier(string $id, array $payload): bool
     {
         if (!FeatureFlags::pricingFirestoreEnabled()) {

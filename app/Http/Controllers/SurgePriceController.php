@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Services\SurgeRulesService;
-use App\Services\PricingService;
+use App\Services\PricingModifiersService;
 use App\Support\FeatureFlags;
 
 class SurgePriceController extends Controller
@@ -14,12 +13,14 @@ class SurgePriceController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(SurgeRulesService $service)
+    public function index(Request $request, PricingModifiersService $service)
     {
         $pageTitle = __('message.list_form_title',['form' => __('message.surge_price')] );
-        $button ='<a href="'.route('surge-prices.create').'" class="float-right btn btn-sm border-radius-10 btn-primary me-2"><i class="fa fa-plus-circle"></i> '.__('message.add_form_title',['form' => __('message.surge_price')]).'</a>';
-        $rules = $service->listRules();
-        return view('surge_price.index', compact('pageTitle','button','rules'));
+        $tab = $request->query('tab', 'all');
+        $type = $tab === 'all' ? null : $tab;
+        $button ='<a href="'.route('surge-prices.create', ['type' => $tab]).'" class="float-right btn btn-sm border-radius-10 btn-primary me-2"><i class="fa fa-plus-circle"></i> '.__('message.add_form_title',['form' => __('message.surge_price')]).'</a>';
+        $rules = $service->listModifiers($type);
+        return view('surge_price.index', compact('pageTitle','button','rules','tab'));
     }
 
     /**
@@ -27,11 +28,11 @@ class SurgePriceController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         $pageTitle = __('message.add_form_title',[ 'form' => __('message.surge_price')]);
-        $cities = app(SurgeRulesService::class)->listCities();
-        return view('surge_price.form', compact('pageTitle','cities'));
+        $type = $request->query('type', 'all');
+        return view('surge_price.form', compact('pageTitle','type'));
     }
 
     /**
@@ -40,97 +41,64 @@ class SurgePriceController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, SurgeRulesService $service, PricingService $pricingService)
+    public function store(Request $request, PricingModifiersService $service)
     {
         $validated = $request->validate([
             'city_id' => ['nullable', 'string'],
             'city_name' => ['nullable', 'string'],
             'service_id' => ['nullable', 'string'],
             'rule_type' => ['required', 'string'],
-            'increase_type' => ['required', 'string'],
-            'increase_value' => ['required', 'numeric', 'min:0'],
+            'modifier_mode' => ['required', 'string'],
+            'modifier_value' => ['required', 'numeric', 'min:0'],
             'description' => ['nullable', 'string'],
-            'weather' => ['nullable', 'string'],
+            'weather_condition' => ['nullable', 'string'],
             'day' => ['nullable', 'string'],
-            'time_from' => ['nullable', 'string'],
-            'time_to' => ['nullable', 'string'],
+            'start_time' => ['nullable', 'string'],
+            'end_time' => ['nullable', 'string'],
             'place_key' => ['nullable', 'string'],
+            'place_name' => ['nullable', 'string'],
+            'zone_id' => ['nullable', 'string'],
+            'surge_tag' => ['nullable', 'string'],
+            'scope' => ['nullable', 'string'],
             'status' => ['required', 'string'],
-            'base_fare' => ['nullable', 'numeric', 'min:0'],
-            'per_km' => ['nullable', 'numeric', 'min:0'],
-            'per_min' => ['nullable', 'numeric', 'min:0'],
-            'min_fare' => ['nullable', 'numeric', 'min:0'],
+            'priority' => ['nullable', 'numeric'],
         ]);
 
-        if (!FeatureFlags::surgeRulesFirestoreEnabled() && !FeatureFlags::pricingFirestoreEnabled()) {
+        if (!FeatureFlags::pricingFirestoreEnabled()) {
             return redirect()->back()->withErrors(['message' => 'Firestore disabled']);
         }
 
         $ruleType = $validated['rule_type'];
-        $ok = true;
-
-        if ($ruleType === 'base_price') {
-            $ok = $pricingService->upsertBasePricing([
-                'cityId' => $validated['city_id'],
-                'serviceId' => $validated['service_id'] ?? '',
-                'baseFare' => $validated['base_fare'] ?? 0,
-                'perKm' => $validated['per_km'] ?? 0,
-                'perMin' => $validated['per_min'] ?? 0,
-                'minFare' => $validated['min_fare'] ?? 0,
-                'status' => $validated['status'],
-            ]);
-
-            if (($validated['time_from'] ?? '') !== '' || ($validated['time_to'] ?? '') !== '') {
-                $ok = $ok && $pricingService->createModifier([
-                    'type' => 'time_price',
-                    'cityId' => $validated['city_id'],
-                    'serviceId' => $validated['service_id'] ?? '',
-                    'timeFrom' => $validated['time_from'] ?? '',
-                    'timeTo' => $validated['time_to'] ?? '',
-                    'baseFare' => $validated['base_fare'] ?? 0,
-                    'perKm' => $validated['per_km'] ?? 0,
-                    'perMin' => $validated['per_min'] ?? 0,
-                    'minFare' => $validated['min_fare'] ?? 0,
-                    'status' => $validated['status'],
-                ]);
-            }
-        } elseif (in_array($ruleType, ['time_price', 'weather_price', 'place_modifier'], true)) {
-            $ok = $pricingService->createModifier([
-                'type' => $ruleType,
-                'cityId' => $validated['city_id'],
-                'cityName' => $validated['city_name'] ?? '',
-                'serviceId' => $validated['service_id'] ?? '',
-                'increaseType' => $validated['increase_type'],
-                'increaseValue' => (float) $validated['increase_value'],
-                'description' => $validated['description'] ?? '',
-                'weather' => $validated['weather'] ?? '',
-                'day' => $validated['day'] ?? 'all',
-                'timeFrom' => $validated['time_from'] ?? '',
-                'timeTo' => $validated['time_to'] ?? '',
-                'placeKey' => $validated['place_key'] ?? '',
-                'status' => $validated['status'],
-            ]);
-        } else {
-            $payload = [
-                'type' => $ruleType,
-                'cityId' => $validated['city_id'],
-                'cityName' => $validated['city_name'] ?? '',
-                'serviceId' => $validated['service_id'] ?? '',
-                'increaseType' => $validated['increase_type'],
-                'increaseValue' => (float) $validated['increase_value'],
-                'description' => $validated['description'] ?? '',
-                'weather' => $validated['weather'] ?? '',
-                'day' => $validated['day'] ?? 'all',
-                'timeFrom' => $validated['time_from'] ?? '',
-                'timeTo' => $validated['time_to'] ?? '',
-                'placeKey' => $validated['place_key'] ?? '',
-                'status' => $validated['status'],
-                'createdAt' => now(),
-                'updatedAt' => now(),
-            ];
-
-            $ok = $service->createRule($payload);
+        $isActive = ($validated['status'] ?? 'active') === 'active';
+        if ($ruleType === 'fixed' && $isActive) {
+            $service->deactivateActiveFixedGlobal();
         }
+
+        $payload = [
+            'type' => $ruleType,
+            'scope' => $validated['scope'] ?? 'global',
+            'cityId' => $validated['city_id'] ?? '',
+            'cityName' => $validated['city_name'] ?? '',
+            'serviceId' => $validated['service_id'] ?? '',
+            'currency' => 'SAR',
+            'modifierMode' => $validated['modifier_mode'],
+            'modifierValue' => (float) $validated['modifier_value'],
+            'day' => $validated['day'] ?? 'all',
+            'startTime' => $validated['start_time'] ?? '',
+            'endTime' => $validated['end_time'] ?? '',
+            'weatherCondition' => $validated['weather_condition'] ?? '',
+            'placeKey' => $validated['place_key'] ?? '',
+            'placeName' => $validated['place_name'] ?? '',
+            'zoneId' => $validated['zone_id'] ?? '',
+            'surgeTag' => $validated['surge_tag'] ?? '',
+            'description' => $validated['description'] ?? '',
+            'isActive' => $isActive,
+            'priority' => $validated['priority'] ?? 0,
+            'createdAt' => now(),
+            'updatedAt' => now(),
+        ];
+
+        $ok = $service->createModifier($payload);
 
         if (!$ok) {
             return redirect()->back()->withErrors(['message' => 'Failed to save rule']);

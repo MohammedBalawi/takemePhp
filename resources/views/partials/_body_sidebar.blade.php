@@ -192,10 +192,37 @@
                 ->prepend('<i class="fas fa-list"></i>')
                 ->link->attr(['class' => '']);
 
-        $menu->add('<span>'.__('message.surge_price').'</span>', [ 'class' => '', 'route' => 'surge-prices.index'])
+        $menu->add('<span>'.__('message.surge_price').'</span>', [ 'class' => ''])
             ->prepend('<i class="fas fa-dollar-sign"></i>')
+            ->nickname('surgeprice')
             ->data('permission', 'surgeprice list')
-            ->link->attr(['class' => '']);
+            ->link->attr(['class' => ''])
+            ->href('#surgeprice');
+
+            $menu->surgeprice->add('<span>عرض كل نسب الزيادة</span>', ['class' => 'sidebar-layout' ,'route' => ['surge-prices.index','tab'=>'all']])
+                ->data('permission', 'surgeprice list')
+                ->prepend('<i class="fas fa-list"></i>')
+                ->link->attr(['class' => '']);
+
+            $menu->surgeprice->add('<span>نسب الجو</span>', ['class' => 'sidebar-layout' ,'route' => ['surge-prices.index','tab'=>'weather']])
+                ->data('permission', 'surgeprice list')
+                ->prepend('<i class="fas fa-cloud"></i>')
+                ->link->attr(['class' => '']);
+
+            $menu->surgeprice->add('<span>نسب الزحام</span>', ['class' => 'sidebar-layout' ,'route' => ['surge-prices.index','tab'=>'surge']])
+                ->data('permission', 'surgeprice list')
+                ->prepend('<i class="fas fa-traffic-light"></i>')
+                ->link->attr(['class' => '']);
+
+            $menu->surgeprice->add('<span>نسب ثابتة</span>', ['class' => 'sidebar-layout' ,'route' => ['surge-prices.index','tab'=>'fixed']])
+                ->data('permission', 'surgeprice list')
+                ->prepend('<i class="fas fa-equals"></i>')
+                ->link->attr(['class' => '']);
+
+            $menu->surgeprice->add('<span>نسب المدن</span>', ['class' => 'sidebar-layout' ,'route' => ['surge-prices.index','tab'=>'city']])
+                ->data('permission', 'surgeprice list')
+                ->prepend('<i class="fas fa-city"></i>')
+                ->link->attr(['class' => '']);
 
         $pending_withdraw_request = $dashboard_metrics['pendingWithdrawRequests'] ?? 0;
         $menu->add('<span>تحويلات السائق</span>'.($pending_withdraw_request > 0 ? '<span class="badge badge-dark ride-badge">'.$pending_withdraw_request.'</span>' : ''), ['class' => ''])
