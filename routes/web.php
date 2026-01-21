@@ -97,6 +97,9 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 Route::resource('rider', RiderController::class);
 Route::get('driver/pending', [ DriverController::class,'pending' ])->name('driver.pending');
+Route::get('drivers/{uid}/verify', [ DriverController::class,'verify' ])->name('driver.verify');
+Route::post('drivers/{uid}/approve', [ DriverController::class,'approve' ])->name('driver.approve');
+Route::post('drivers/{uid}/reject', [ DriverController::class,'reject' ])->name('driver.reject');
 Route::get('driver/{id}/documents', [ DriverController::class,'documents' ])->name('driver.documents');
 Route::resource('driver', DriverController::class)->except(['show','edit','update','destroy']);
 Route::resource('sub-admin', SubAdminController::class)->only(['index', 'create', 'store']);

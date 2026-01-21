@@ -16,6 +16,9 @@ use App\Console\Commands\VerifyFirestore;
 use App\Console\Commands\CreateFirebaseAdmin;
 use App\Console\Commands\FirestoreAdminCreate;
 use App\Console\Commands\FirebasePing;
+use App\Console\Commands\DriversPendingSample;
+use App\Console\Commands\DriversApprove;
+use App\Console\Commands\DriversReject;
 
 class Kernel extends ConsoleKernel
 {
@@ -37,6 +40,9 @@ class Kernel extends ConsoleKernel
         CreateFirebaseAdmin::class,
         FirestoreAdminCreate::class,
         FirebasePing::class,
+        DriversPendingSample::class,
+        DriversApprove::class,
+        DriversReject::class,
     ];
     protected function schedule(Schedule $schedule)
     {

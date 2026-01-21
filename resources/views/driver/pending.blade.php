@@ -39,8 +39,21 @@
                                                     @if(!empty($driver['uid']) || !empty($driver['__id']))
                                                         @php
                                                             $driverId = $driver['uid'] ?? $driver['__id'];
+                                                            $status = strtolower((string) ($driver['verificationStatus'] ?? $driver['status'] ?? ''));
+                                                            $isPending = $status === 'pending';
                                                         @endphp
-                                                        <a href="{{ route('driver.documents', ['id' => $driverId]) }}" class="btn btn-sm btn-primary">{{ __('message.document') }}</a>
+                                                        <a href="{{ route('driver.verify', ['uid' => $driverId]) }}" class="btn btn-sm btn-info">تحقق</a>
+                                                        @if($isPending)
+                                                            <form method="POST" action="{{ route('driver.approve', ['uid' => $driverId]) }}" class="d-inline-block" onsubmit="return confirm('تأكيد قبول السائق؟');">
+                                                                @csrf
+                                                                <button type="submit" class="btn btn-sm btn-success">قبول</button>
+                                                            </form>
+                                                            <form method="POST" action="{{ route('driver.reject', ['uid' => $driverId]) }}" class="d-inline-block js-reject-form">
+                                                                @csrf
+                                                                <input type="hidden" name="reason" value="">
+                                                                <button type="submit" class="btn btn-sm btn-danger">رفض</button>
+                                                            </form>
+                                                        @endif
                                                     @else
                                                         <span class="text-muted">-</span>
                                                     @endif
@@ -60,4 +73,22 @@
             </div>
         </div>
     </div>
+    <script>
+        document.querySelectorAll('.js-reject-form').forEach(function(form) {
+            form.addEventListener('submit', function(e) {
+                var reason = prompt('سبب الرفض (اختياري):');
+                if (reason === null) {
+                    e.preventDefault();
+                    return;
+                }
+                var input = form.querySelector('input[name="reason"]');
+                if (input) {
+                    input.value = reason;
+                }
+                if (!confirm('تأكيد رفض السائق؟')) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
 </x-master-layout>

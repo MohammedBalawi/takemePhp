@@ -240,6 +240,41 @@ class DriversService
         return $this->getDriverDocumentsLinks($driver);
     }
 
+    public function approveDriver(string $uid): bool
+    {
+        return $this->updateVerificationStatus($uid, 'approved', null);
+    }
+
+    public function rejectDriver(string $uid, ?string $reason = null): bool
+    {
+        return $this->updateVerificationStatus($uid, 'rejected', $reason);
+    }
+
+    private function updateVerificationStatus(string $uid, string $status, ?string $reason): bool
+    {
+        if (!FeatureFlags::driversFirestoreEnabled()) {
+            throw new \RuntimeException('FIRESTORE_ENABLED=false for drivers');
+        }
+
+        $uid = trim($uid);
+        if ($uid === '') {
+            return false;
+        }
+
+        $fields = [
+            'verificationStatus' => $status,
+            'status' => $status,
+            'isVerified' => $status === 'approved',
+            'updatedAt' => now()->toIso8601String(),
+        ];
+
+        if ($status === 'rejected' && $reason !== null && $reason !== '') {
+            $fields['rejectionReason'] = $reason;
+        }
+
+        return $this->firestore->patchDocumentTyped('drivers', $uid, $fields);
+    }
+
     private function withLinkFlags(array $items): array
     {
         $out = [];

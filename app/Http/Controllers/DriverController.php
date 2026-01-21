@@ -60,6 +60,28 @@ class DriverController extends Controller
         return view('driver.documents', compact('pageTitle', 'assets', 'driver', 'links'));
     }
 
+    public function verify(string $uid)
+    {
+        $pageTitle = __('message.driver_document');
+        $assets = [];
+        $driver = app(DriversService::class)->getDriverById($uid);
+        $links = app(DriversService::class)->getDriverDocumentLinks($driver);
+        return view('driver.verify', compact('pageTitle', 'assets', 'driver', 'links'));
+    }
+
+    public function approve(string $uid)
+    {
+        $ok = app(DriversService::class)->approveDriver($uid);
+        return redirect()->route('driver.pending')->withSuccess($ok ? __('message.update_form', ['form' => __('message.driver')]) : __('message.something_wrong'));
+    }
+
+    public function reject(string $uid)
+    {
+        $reason = request('reason');
+        $ok = app(DriversService::class)->rejectDriver($uid, $reason);
+        return redirect()->route('driver.pending')->withSuccess($ok ? __('message.update_form', ['form' => __('message.driver')]) : __('message.something_wrong'));
+    }
+
     public function show($id)
     {
         abort(404);
