@@ -1,4 +1,8 @@
 <x-master-layout>
+    @php
+        $auth_user = authSession();
+        $isSuperAdmin = $auth_user->hasRole('super_admin');
+    @endphp
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-12 mb-3">
@@ -13,6 +17,7 @@
             </div>
             <div class="col-lg-12">
                 <div class="row">
+                    @if($isSuperAdmin)
                     <div class="col-lg-3 col-md-6">
                         <div class="card card-block card-stretch card-height border-radius-20">
                             <div class="card-body">
@@ -78,6 +83,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
 
                     <div class="col-lg-3 col-md-6">
                         <div class="card card-block card-stretch card-height border-radius-20">
@@ -147,6 +153,7 @@
 
             <div class="col-lg-12">
                 <div class="row">
+                    @if($isSuperAdmin)
                     <div class="col-lg-6">
                         <div class="card card-block card-stretch card-height border-radius-20 ">
                             <div class="card-header d-flex justify-content-between border-radius-20">
@@ -161,6 +168,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
 
                     <div class="col-lg-6">
                         <div class="card card-block card-stretch card-height border-radius-20 ">
@@ -247,6 +255,7 @@
         <!-- Page end  -->
     </div>
     @section('bottom_script')
+    @if($isSuperAdmin)
     <script>
 
         var options = {
@@ -296,5 +305,6 @@
         var chart = new ApexCharts(document.querySelector("#dash-income-chart"), options);
         chart.render();
     </script>
+    @endif
     @endsection
 </x-master-layout>

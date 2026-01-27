@@ -18,7 +18,7 @@ class DashboardMetricsService
         $this->firestore = $firestore;
     }
 
-    public function getDashboardMetrics(): array
+    public function getDashboardMetrics(bool $includeEarnings = true): array
     {
         if (!FeatureFlags::firestoreEnabled()) {
             throw new \RuntimeException('FIRESTORE_ENABLED=false for dashboard metrics');
@@ -36,9 +36,9 @@ class DashboardMetricsService
                 'pendingDrivers' => $this->countDriversPending(),
                 'totalRiders' => $this->countRiders(),
                 'totalRides' => $this->countRidesAll(),
-                'todayEarnings' => $this->sumRidesTotalsByRange($this->todayStart(), $this->todayEnd()),
-                'monthEarnings' => $this->sumRidesTotalsByRange($this->monthStart(), $this->monthEnd()),
-                'totalEarnings' => $this->sumRidesTotalsByRange(null, null),
+                'todayEarnings' => $includeEarnings ? $this->sumRidesTotalsByRange($this->todayStart(), $this->todayEnd()) : 0,
+                'monthEarnings' => $includeEarnings ? $this->sumRidesTotalsByRange($this->monthStart(), $this->monthEnd()) : 0,
+                'totalEarnings' => $includeEarnings ? $this->sumRidesTotalsByRange(null, null) : 0,
                 'sosCount' => $this->countSosAlerts(),
                 'recentRides' => [],
                 'newRideRequests' => 0,

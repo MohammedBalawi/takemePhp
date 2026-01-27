@@ -1526,16 +1526,21 @@ function getPriceFormat($price)
         $price = 0;
     }
 
-    $currency_code = SettingData('CURRENCY', 'CURRENCY_CODE') ?? 'USD';
+    $currency_code = SettingData('CURRENCY', 'CURRENCY_CODE') ?? 'SAR';
+    $currency_code = strtoupper($currency_code);
     $currecy = currencyArray($currency_code);
 
     $code = $currecy['symbol'] ?? '$';
+    if ($currency_code === 'SAR') {
+        $code = 'ر.س';
+    }
     $position = SettingData('CURRENCY', 'CURRENCY_POSITION') ?? 'left';
+    $formatted = number_format((float) $price, 2, '.', ',');
 
     if ($position == 'left') {
-        $price = $code."".number_format( (float) $price,2,'.','');
+        $price = $code." ".$formatted;
     } else {
-        $price = number_format( (float) $price, 2,'.','')."".$code;
+        $price = $formatted." ".$code;
     }
 
     return $price;

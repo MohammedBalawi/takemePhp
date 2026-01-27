@@ -11,25 +11,25 @@
                            <th class="text-center prc-wrap"></th>
                            <th class="text-center prc-wrap">
                               <div class="prc-box">
-                                 <div class="h3 pt-4">$19<small> / Per month</small>
+                                <div class="h3 pt-4">19 ر.س<small> / Per month</small>
                                  </div> <span class="type">Basic</span>
                               </div>
                            </th>
                            <th class="text-center prc-wrap">
                               <div class="prc-box active">
-                                 <div class="h3 pt-4">$39<small> / Per month</small>
+                                <div class="h3 pt-4">39 ر.س<small> / Per month</small>
                                  </div> <span class="type">Standard</span>
                               </div>
                            </th>
                            <th class="text-center prc-wrap">
                               <div class="prc-box">
-                                 <div class="h3 pt-4">$119<small> / Per month</small>
+                                <div class="h3 pt-4">119 ر.س<small> / Per month</small>
                                  </div> <span class="type">Platinum</span>
                               </div>
                            </th>
                            <th class="text-center prc-wrap">
                               <div class="prc-box">
-                                 <div class="h3 pt-4">$219<small> / Per month</small>
+                                <div class="h3 pt-4">219 ر.س<small> / Per month</small>
                                  </div> <span class="type">Premium</span>
                               </div>
                            </th>

@@ -84,8 +84,8 @@
                                                    </p>
                                                 </td>
                                                 <td class="text-center">5</td>
-                                                <td class="text-center">$120.00</td>
-                                                <td class="text-center"><b>$2,880.00</b></td>
+                                                <td class="text-center">120.00 ر.س</td>
+                                                <td class="text-center"><b>2,880.00 ر.س</b></td>
                                           </tr>
                                           <tr>
                                                 <th class="text-center" scope="row">2</th>
@@ -95,8 +95,8 @@
                                                    </p>
                                                 </td>
                                                 <td class="text-center">5</td>
-                                                <td class="text-center">$120.00</td>
-                                                <td class="text-center"><b>$2,880.00</b></td>
+                                                <td class="text-center">120.00 ر.س</td>
+                                                <td class="text-center"><b>2,880.00 ر.س</b></td>
                                           </tr>
                                           <tr>
                                                 <th class="text-center" scope="row">3</th>
@@ -106,8 +106,8 @@
                                                    </p>
                                                 </td>
                                                 <td class="text-center">5</td>
-                                                <td class="text-center">$120.00</td>
-                                                <td class="text-center"><b>$2,880.00</b></td>
+                                                <td class="text-center">120.00 ر.س</td>
+                                                <td class="text-center"><b>2,880.00 ر.س</b></td>
                                           </tr>
                                           <tr>
                                                 <th class="text-center" scope="row">4</th>
@@ -117,8 +117,8 @@
                                                    </p>
                                                 </td>
                                                 <td class="text-center">5</td>
-                                                <td class="text-center">$120.00</td>
-                                                <td class="text-center"><b>$2,880.00</b></td>
+                                                <td class="text-center">120.00 ر.س</td>
+                                                <td class="text-center"><b>2,880.00 ر.س</b></td>
                                           </tr>
                                        </tbody>
                                     </table>
@@ -153,7 +153,7 @@
                                        </div>
                                        <div class="mb-2">
                                           <h6>Sub Total</h6>
-                                          <p>$4597.50</p>
+                                          <p>4597.50 ر.س</p>
                                        </div>
                                        <div>
                                           <h6>Discount</h6>
@@ -162,7 +162,7 @@
                                     </div>
                                     <div class="ttl-amt py-2 px-3 d-flex justify-content-between align-items-center">
                                        <h6>Total</h6>
-                                       <h3 class="text-primary font-weight-700">$4137.75</h3>
+                                       <h3 class="text-primary font-weight-700">4137.75 ر.س</h3>
                                     </div>
                               </div>
                            </div>

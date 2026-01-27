@@ -26,13 +26,19 @@ class HomeController extends Controller
     {
         $adminName = (string) $request->session()->get('admin_name', 'Admin');
         $adminLanguage = (string) $request->session()->get('admin_language', 'ar');
+        $auth_user = authSession();
+        $isSuperAdmin = $auth_user->hasRole('super_admin');
 
         $metricsService = app(DashboardMetricsService::class);
-        $dashboard = $metricsService->getDashboardMetrics();
+        $dashboard = $metricsService->getDashboardMetrics($isSuperAdmin);
         $recent_riderequest = $metricsService->getRecentRides(10);
 
-        $incomeService = app(DashboardIncomeService::class);
-        $incomeSeries = $incomeService->monthlyIncomeSeries((int) date('Y'));
+        if ($isSuperAdmin) {
+            $incomeService = app(DashboardIncomeService::class);
+            $incomeSeries = $incomeService->monthlyIncomeSeries((int) date('Y'));
+        } else {
+            $incomeSeries = array_fill(0, 12, 0);
+        }
 
         return view('dashboards.admin-dashboard', compact('incomeSeries', 'dashboard', 'recent_riderequest', 'adminName', 'adminLanguage'));
     }

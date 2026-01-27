@@ -43,7 +43,16 @@ class DashboardController extends Controller
 
     public function adminDashboard(Request $request)
     {
-        
+        $auth_user = auth()->user();
+        $isSuperAdmin = false;
+        if ($auth_user) {
+            $isSuperAdmin = method_exists($auth_user, 'hasRole') && $auth_user->hasRole('super_admin');
+            $isSuperAdmin = $isSuperAdmin || (($auth_user->user_type ?? '') === 'super_admin') || (($auth_user->role ?? '') === 'super_admin');
+        }
+        if (! $isSuperAdmin) {
+            return json_message_response('Forbidden', 403);
+        }
+
         $dashboard_data = $this->commonDashboard($request);
 
         return json_custom_response($dashboard_data);

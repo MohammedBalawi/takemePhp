@@ -451,7 +451,7 @@
                                     <h5>Full Tees</h5>
                                     <p class="mb-0 text-primary">100 Items</p>
                                 </div>
-                                <p class="mb-0  text-danger"><b>$ 12.8</b></p>
+                                <p class="mb-0  text-danger"><b>12.8 ر.س</b></p>
                             </li>
                             <li class="media align-items-center mt-3">
                                 <a href="JavaScript:Void(0);"><img src="{{asset('images/layouts/layout-1/prod-2.jpg')}}"
@@ -460,7 +460,7 @@
                                     <h5>Denim Jeans</h5>
                                     <p class="mb-0 text-primary">92 Items</p>
                                 </div>
-                                <p class="mb-0  text-danger"><b>$ 15.6</b></p>
+                                <p class="mb-0  text-danger"><b>15.6 ر.س</b></p>
                             </li>
                             <li class="media align-items-center mt-3">
                                 <a href="JavaScript:Void(0);"><img src="{{asset('images/layouts/layout-1/prod-3.jpg')}}"
@@ -469,7 +469,7 @@
                                     <h5>Hip Hop Hat</h5>
                                     <p class="mb-0 text-primary">50 Items</p>
                                 </div>
-                                <p class="mb-0  text-danger"><b>$ 18.5</b></p>
+                                <p class="mb-0  text-danger"><b>18.5 ر.س</b></p>
                             </li>
                             <li class="media align-items-center mt-3">
                                 <a href="JavaScript:Void(0);"><img src="{{asset('images/layouts/layout-1/prod-4.jpg')}}"
@@ -478,7 +478,7 @@
                                     <h5>Sports Shoes</h5>
                                     <p class="mb-0 text-primary">95 Items</p>
                                 </div>
-                                <p class="mb-0  text-danger"><b>$ 11.0</b></p>
+                                <p class="mb-0  text-danger"><b>11.0 ر.س</b></p>
                             </li>
                             
                         </ul>
