@@ -153,8 +153,7 @@ Route::group(['middleware' => ['admin.session']], function()
     Route::resource('surge-prices', SurgePriceController::class)->only(['index', 'create', 'store']);
 
     Route::get('pricing', [PricingController::class, 'index'])->name('pricing.index');
-    Route::get('pricing/create', [PricingController::class, 'create'])->name('pricing.create');
-    Route::post('pricing', [PricingController::class, 'store'])->name('pricing.store');
+    Route::post('pricing', [PricingController::class, 'update'])->name('pricing.update');
 
     Route::get('pricing-modifiers', [PricingModifiersController::class, 'index'])->name('pricing_modifiers.index');
     Route::get('pricing-modifiers/create', [PricingModifiersController::class, 'create'])->name('pricing_modifiers.create');

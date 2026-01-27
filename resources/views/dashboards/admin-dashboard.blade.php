@@ -4,7 +4,7 @@
             <div class="col-lg-12 mb-3">
                 <div class="d-flex align-items-center justify-content-between welcome-content">
                     <div class="navbar-breadcrumb">
-                        <h4 class="mb-0 font-weight-700">Welcome To Dashboard Take Me</h4>
+                        <h4 class="mb-0 font-weight-700">أهلاً بك في لوحة التحكم، Take Me</h4>
                     </div>
                     <div class="">
 
@@ -176,7 +176,7 @@
                                     <table class="table mb-1 table-striped text-center">
                                         <thead>
                                             <tr>
-                                                <th scope='col'>#</th>
+                                                <th scope='col'>{{ __('message.number') }}</th>
                                                 <th scope='col'>{{ __('message.rider') }}</th>
                                                 <th scope='col'>{{ __('message.phone') }}</th>
                                                 <th scope='col'>{{ __('message.driver') }}</th>
@@ -190,7 +190,6 @@
                                                 <th scope='col'>{{ __('message.requested_date') }}</th>
                                                 <th scope='col'>{{ __('message.payment_method') }}</th>
                                                 <th scope='col'>{{ __('message.payment_status') }}</th>
-                                                <th scope='col'>{{ __('message.action') }}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -229,13 +228,6 @@
                                                         <td>{{ dateAgoFormate($riderequest['createdAt'] ?? null, true) }}</td>
                                                         <td>{{ $riderequest['paymentMethod'] ?? '-' }}</td>
                                                         <td>{{ $riderequest['paymentStatus'] ?? '-' }}</td>
-                                                        <td>
-                                                            @if(!empty($riderequest['id']))
-                                                                <a href="{{ route('rides.show', ['id' => $riderequest['id']]) }}" class="btn btn-sm btn-primary">View</a>
-                                                            @else
-                                                                -
-                                                            @endif
-                                                        </td>
                                                     </tr>
                                                 @endforeach
                                             @else

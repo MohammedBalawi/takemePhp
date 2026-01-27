@@ -3,36 +3,42 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Services\PricingService;
 use App\Support\FeatureFlags;
+use App\Services\FirestoreRestService;
 
 class PricingController extends Controller
 {
-    public function index(PricingService $service)
+    private const DOC_PATH = 'pricing/taxi/zones/city_hebron/rates/default';
+
+    public function index(FirestoreRestService $firestore)
     {
-        $pageTitle = 'التسعيرة الأساسية';
-        $rows = $service->listBasePricing();
-        return view('pricing.index', compact('pageTitle', 'rows'));
+        if (!FeatureFlags::pricingFirestoreEnabled()) {
+            return redirect()->back()->withErrors(['message' => 'Firestore disabled']);
+        }
+
+        $pageTitle = 'التسعيرة';
+        $docPath = self::DOC_PATH;
+        $doc = $firestore->getDocumentPath($docPath);
+        $fields = $doc ? $firestore->decodeDocumentFields($doc) : [];
+        $updatedAt = $firestore->tsToString($fields['updatedAt'] ?? null, $doc['updateTime'] ?? null);
+
+        return view('pricing.index', compact('pageTitle', 'docPath', 'fields', 'updatedAt'));
     }
 
-    public function create()
-    {
-        $pageTitle = 'إضافة تسعيرة أساسية';
-        return view('pricing.form', compact('pageTitle'));
-    }
-
-    public function store(Request $request, PricingService $service)
+    public function update(Request $request, FirestoreRestService $firestore)
     {
         $validated = $request->validate([
-            'city_id' => ['nullable', 'string'],
-            'city_name' => ['nullable', 'string'],
-            'service_id' => ['required', 'string'],
-            'currency' => ['nullable', 'string'],
-            'base_fare' => ['required', 'numeric', 'min:0'],
-            'per_km' => ['required', 'numeric', 'min:0'],
-            'per_min' => ['required', 'numeric', 'min:0'],
-            'min_fare' => ['required', 'numeric', 'min:0'],
-            'is_active' => ['nullable'],
+            'isActive' => ['nullable', 'boolean'],
+            'baseFare' => ['nullable', 'numeric'],
+            'bookingFee' => ['nullable', 'numeric'],
+            'cancelFee' => ['nullable', 'numeric'],
+            'minimumFare' => ['nullable', 'numeric'],
+            'perKm' => ['nullable', 'numeric'],
+            'perMin' => ['nullable', 'numeric'],
+            'nightStartHour' => ['nullable', 'numeric'],
+            'nightEndHour' => ['nullable', 'numeric'],
+            'nightMultiplier' => ['nullable', 'numeric'],
+            'surgeMultiplierDefault' => ['nullable', 'numeric'],
         ]);
 
         if (!FeatureFlags::pricingFirestoreEnabled()) {
@@ -40,18 +46,29 @@ class PricingController extends Controller
         }
 
         $payload = [
-            'cityId' => $validated['city_id'] ?? '',
-            'cityName' => $validated['city_name'] ?? '',
-            'serviceId' => $validated['service_id'],
-            'currency' => $validated['currency'] ?? 'SAR',
-            'baseFare' => (float) $validated['base_fare'],
-            'perKm' => (float) $validated['per_km'],
-            'perMin' => (float) $validated['per_min'],
-            'minFare' => (float) $validated['min_fare'],
-            'isActive' => !empty($validated['is_active']),
+            'isActive' => !empty($validated['isActive']),
         ];
 
-        $ok = $service->upsertBasePricing($payload);
+        $numericFields = [
+            'baseFare',
+            'bookingFee',
+            'cancelFee',
+            'minimumFare',
+            'perKm',
+            'perMin',
+            'nightStartHour',
+            'nightEndHour',
+            'nightMultiplier',
+            'surgeMultiplierDefault',
+        ];
+
+        foreach ($numericFields as $field) {
+            if (array_key_exists($field, $validated) && $validated[$field] !== null) {
+                $payload[$field] = (float) $validated[$field];
+            }
+        }
+
+        $ok = $firestore->patchDocumentPath(self::DOC_PATH, $payload);
         if (!$ok) {
             return redirect()->back()->withErrors(['message' => 'Failed to save pricing']);
         }

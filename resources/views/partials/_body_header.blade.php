@@ -7,8 +7,7 @@
                     @php
                         $app_settings = appSettingData('get');
                     @endphp
-                    <img src="{{ getSingleMedia($app_settings,'site_logo',null) }}" class="img-fluid mode light-img rounded-normal site_logo_preview " alt="logo">
-                    <img src="{{ getSingleMedia($app_settings,'site_dark_logo',null) }}" class="img-fluid mode dark-img rounded-normal darkmode-logo site_dark_logo_preview" alt="dark-logo">
+                    <img src="{{ getSingleMedia($app_settings,'site_logo',null) }}" class="img-fluid rounded-normal site_logo_preview app-logo" alt="logo">
                     <span class="ml-1 font-weight-bold">Take Me</span>
                 </a>
             </div>

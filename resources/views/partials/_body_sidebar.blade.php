@@ -219,6 +219,12 @@
                 ->prepend('<i class="fas fa-city"></i>')
                 ->link->attr(['class' => '']);
 
+        $menu->add('<span>التسعيرة</span>', ['route' => 'pricing.index'])
+            ->prepend('<i class="fas fa-tag"></i>')
+            ->nickname('pricing')
+            ->data('permission', 'pricing list')
+            ->link->attr(['class' => '']);
+
         $pending_withdraw_request = $dashboard_metrics['pendingWithdrawRequests'] ?? 0;
         $menu->add('<span>تحويلات السائق</span>'.($pending_withdraw_request > 0 ? '<span class="badge badge-dark ride-badge">'.$pending_withdraw_request.'</span>' : ''), ['class' => ''])
             ->prepend('<i class="fas fa-money-check"></i>')
@@ -328,8 +334,7 @@
             @php
                 $app_settings = $app_settings ?? appSettingData('get');
             @endphp
-            <img src="{{ getSingleMedia($app_settings,'site_logo',null) }}" class="img-fluid mode light-img rounded-normal light-logo site_logo_preview" alt="logo">
-            <img src="{{ getSingleMedia($app_settings,'site_dark_logo',null) }}" class="img-fluid mode dark-img rounded-normal darkmode-logo site_dark_logo_preview" alt="dark-logo">
+            <img src="{{ getSingleMedia($app_settings,'site_logo',null) }}" class="img-fluid rounded-normal light-logo site_logo_preview app-logo" alt="logo">
         </a>
         <div class="side-menu-bt-sidebar">
             <i class="fas fa-bars wrapper-menu"></i>
